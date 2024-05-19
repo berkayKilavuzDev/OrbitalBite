@@ -1,0 +1,15 @@
+/db.sqlite3
+/workArea.ipynb
+/media
+/static
+
+/accounts/__pycache__
+/events/__pycache__
+/davetlisiniz/__pycache__
+
+/accounts/migrations
+/events/migrations
+
+/req.txt
+
+/frontend
