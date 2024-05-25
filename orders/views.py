@@ -8,6 +8,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from .forms import CustomUserCreationForm
 
+from django.contrib.auth.decorators import login_required
+
 def signup(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
@@ -26,3 +28,23 @@ class HomeView(View):
 class CustomLoginView(LoginView):
     template_name = 'login.html'  # Specify the template name
     success_url = reverse_lazy('home')  # Redirect URL after successful login
+
+@login_required
+def account(request):
+    # Logic to fetch user's account information
+    user = request.user
+    context = {
+        'user': user,
+        # Add other context variables as needed
+    }
+    return render(request, 'account.html', context)
+
+@login_required
+def order_history(request):
+    # Logic to fetch user's account information
+    user = request.user
+    context = {
+        'user': user,
+        # Add other context variables as needed
+    }
+    return render(request, 'order_history.html', context)
