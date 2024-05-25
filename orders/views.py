@@ -9,6 +9,7 @@ from django.contrib.auth import login
 from .forms import CustomUserCreationForm
 
 from django.contrib.auth.decorators import login_required
+from .models import Category, Item, Basket
 
 def signup(request):
     if request.method == 'POST':
@@ -21,9 +22,29 @@ def signup(request):
         form = CustomUserCreationForm()
     return render(request, 'signup.html', {'form': form})
 
-class HomeView(View):
-    def get(self, request):
-        return render(request, 'home.html')
+def home_view(request):
+    # Retrieve all categories
+    categories = Category.objects.all()
+
+    # Create a dictionary to hold category-item mapping
+    category_items = {}
+    for category in categories:
+        # Retrieve items for each category
+        items = Item.objects.filter(category=category)
+        category_items[category] = items
+
+    # Get basket items for the logged-in user
+    if request.user.is_authenticated:
+        basket_items = Basket.objects.filter(user=request.user)
+
+    # Pass the categories, category-item mapping, and basket items to the template context
+    context = {
+        'categories': categories,
+        'category_items': category_items,
+        'basket_items': basket_items if request.user.is_authenticated else None
+    }
+
+    return render(request, 'home.html', context)
 
 class CustomLoginView(LoginView):
     template_name = 'login.html'  # Specify the template name

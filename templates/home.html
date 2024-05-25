@@ -4,123 +4,33 @@
     <!-- Main Content -->
     <div class="container">
         <div class="row">
-            <!-- Categories -->
-            <div class="col-md-2 mt-4">
+            <!-- Categories -->            
+            <div class="col-md-2 mt-4">                
                 <h2>Categories</h2>
+                {% for category in categories %}
                 <div class="list-group" id="categories">
-                    <a href="#category1" class="list-group-item list-group-item-action">Category 1</a>
-                    <a href="#category2" class="list-group-item list-group-item-action">Category 2</a>
-                    <a href="#category3" class="list-group-item list-group-item-action">Category 3</a>
+                    <a href="#{{ category.name }}" class="list-group-item list-group-item-action">{{ category.name }}</a>
                 </div>
-            </div>
-            
+                {% endfor %}
+            </div>            
             <!-- Menu Items -->
             <div class="col-md-6 mt-4">
                 <h2>Menu</h2>
-                <!-- Category 1 -->
-                <div class="container category" id="category1">
+                {% for category in categories %}
+                <div class="container category" id="{{ category.name }}">
                     <hr>
-                    <h4>Category 1</h4>
-                    <div class="card mb-3">
+                    <h4>{{ category.name }}</h4>
+                    {% for item in category.items.all %}
+                    <div class="card mb-3">                        
                         <div class="card-body">
-                            <h5 class="card-title">Item 1</h5>
-                            <p class="card-text">$10.00</p>
+                            <h5 class="card-title">{{ item.name }}</h5>
+                            <p class="card-text">{{ item.price }}</p>
                             <a href="#" class="btn btn-primary">Add to Cart</a>
-                        </div>
+                        </div>                        
                     </div>
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title">Item 2</h5>
-                            <p class="card-text">$12.00</p>
-                            <a href="#" class="btn btn-primary">Add to Cart</a>
-                        </div>
-                    </div>
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title">Item 3</h5>
-                            <p class="card-text">$8.00</p>
-                            <a href="#" class="btn btn-primary">Add to Cart</a>
-                        </div>
-                    </div>
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title">Item 4</h5>
-                            <p class="card-text">$9.00</p>
-                            <a href="#" class="btn btn-primary">Add to Cart</a>
-                        </div>
-                    </div>
-                    <!-- Add more items -->
-                </div>
-
-                <!-- Category 2 -->
-                <div class="container category" id="category2">
-                    <hr>
-                    <h4>Category 2</h4>
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title">Item 5</h5>
-                            <p class="card-text">$15.00</p>
-                            <a href="#" class="btn btn-primary">Add to Cart</a>
-                        </div>
-                    </div>
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title">Item 6</h5>
-                            <p class="card-text">$11.00</p>
-                            <a href="#" class="btn btn-primary">Add to Cart</a>
-                        </div>
-                    </div>
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title">Item 7</h5>
-                            <p class="card-text">$13.00</p>
-                            <a href="#" class="btn btn-primary">Add to Cart</a>
-                        </div>
-                    </div>
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title">Item 8</h5>
-                            <p class="card-text">$10.00</p>
-                            <a href="#" class="btn btn-primary">Add to Cart</a>
-                        </div>
-                    </div>
-                    <!-- Add more items -->
-                </div>
-
-                <!-- Category 3 -->
-                <div class="container category" id="category3">
-                    <hr>
-                    <h4>Category 3</h4>
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title">Item 9</h5>
-                            <p class="card-text">$20.00</p>
-                            <a href="#" class="btn btn-primary">Add to Cart</a>
-                        </div>
-                    </div>
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title">Item 10</h5>
-                            <p class="card-text">$18.00</p>
-                            <a href="#" class="btn btn-primary">Add to Cart</a>
-                        </div>
-                    </div>
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title">Item 11</h5>
-                            <p class="card-text">$22.00</p>
-                            <a href="#" class="btn btn-primary">Add to Cart</a>
-                        </div>
-                    </div>
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title">Item 12</h5>
-                            <p class="card-text">$25.00</p>
-                            <a href="#" class="btn btn-primary">Add to Cart</a>
-                        </div>
-                    </div>
-                    <!-- Add more items -->
-                </div>
+                    {% endfor %}
+                </div>  
+                {% endfor %}              
             </div>
 
             <!-- Basket -->
@@ -129,38 +39,25 @@
                 <div class="card">
                     <ul class="list-group list-group-flush" id="basket-items">
                         <!-- Basket items will be dynamically added here -->
+                        {% for basket_item in basket_items %}
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             <div class="d-flex flex-column col-md-6">
-                                <span>Berkay Kucukkilavuz and sose and friends</span>
+                                <span>{{ basket_item.item.name }}</span>
                             </div>
                             <div class="input-group input-group-sm">
                                 <div class="input-group-prepend">
                                     <button class="btn btn-outline-secondary" type="button">-</button>
                                 </div>
-                                <span class="badge badge-pill mx-2" style="line-height: 2;">2</span>
+                                <span class="badge badge-pill mx-2" style="line-height: 2;">{{ basket_item.quantity }}</span>
                                 <div class="input-group-append">
                                     <button class="btn btn-outline-secondary" type="button">+</button>
                                 </div>
                             </div>
-                            <span class="badge badge-success">$20.00</span>
-                        </li>                       
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <div class="d-flex flex-column col-md-6">
-                                <span>Item 3</span>
-                            </div>
-                            <div class="input-group input-group-sm">
-                                <div class="input-group-prepend">
-                                    <button class="btn btn-outline-secondary" type="button">-</button>
-                                </div>
-                                <span class="badge badge-pill mx-2" style="line-height: 2;">1</span>
-                                <div class="input-group-append">
-                                    <button class="btn btn-outline-secondary" type="button">+</button>
-                                </div>
-                            </div>
-                            <span class="badge badge-success">$12.00</span>
-                        </li>            
-                        <!-- Add more items if needed -->
+                            <span class="badge badge-success">{{ basket_item.item.price }}</span>
+                        </li>
+                        {% endfor %}
                     </ul>
+                    
                     <div class="card-footer d-flex justify-content-between align-items-center">
                         <a href="#" class="btn btn-primary">Checkout</a>
                         <h5 class="card-title mt-2 ml-1">Total: $32.00</h5>                
