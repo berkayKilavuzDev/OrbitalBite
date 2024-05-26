@@ -25,7 +25,12 @@
                         <div class="card-body">
                             <h5 class="card-title">{{ item.name }}</h5>
                             <p class="card-text">{{ item.price }}</p>
-                            <a href="#" class="btn btn-primary">Add to Cart</a>
+                            <form method="post" id="add-to-cart-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="item_id" value="{{ item.id }}">
+                                <input type="hidden" name="quantity" value="1"> <!-- Assuming you're adding one item by default -->
+                                <button type="button" class="btn btn-primary add-to-cart-btn">Add to Cart</button>
+                            </form>
                         </div>                        
                     </div>
                     {% endfor %}
@@ -66,4 +71,48 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+    
+            addToCartButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const form = button.closest('form');
+                    const itemId = form.querySelector('[name="item_id"]').value;
+                    const quantity = form.querySelector('[name="quantity"]').value; // Assuming you have an input field named 'quantity' in your form
+                    addToCart(itemId, quantity);
+                });
+            });
+    
+            function addToCart(itemId, quantity) {
+                const formData = new FormData();
+                formData.append('item_id', itemId);
+                formData.append('quantity', quantity);
+    
+                fetch('{% url "add_to_basket" %}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                    body: formData,
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Failed to add item to cart');
+                    }
+                })
+                .then(data => {
+                    // Update the UI to reflect the changes in the basket
+                    console.log(data);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+            }
+            
+        });
+    </script>
 {% endblock %}

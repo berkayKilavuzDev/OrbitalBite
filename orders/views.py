@@ -11,6 +11,36 @@ from .forms import CustomUserCreationForm
 from django.contrib.auth.decorators import login_required
 from .models import Category, Item, Basket
 
+from django.http import JsonResponse
+
+def add_to_basket(request):
+    if request.method == 'POST':
+        item_id = request.POST.get('item_id')
+        quantity = request.POST.get('quantity')
+
+        # Validate input
+        if not item_id or not quantity:
+            return JsonResponse({'error': 'Item ID and quantity are required.'}, status=400)
+
+        try:
+            # Create or update the basket item
+            basket_item, created = Basket.objects.get_or_create(
+                user=request.user,  # Assuming user is associated with the basket
+                item_id=item_id,
+                defaults={'quantity': quantity}
+            )
+
+            # If not created, update the quantity
+            if not created:
+                basket_item.quantity += int(quantity)
+                basket_item.save()
+
+            return JsonResponse({'success': 'Item added to basket successfully.'})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'error': 'Invalid request method.'}, status=405)
+
 def signup(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
