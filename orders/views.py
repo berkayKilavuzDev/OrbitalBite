@@ -1,4 +1,3 @@
-
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, View
 from django.contrib.auth.forms import UserCreationForm
@@ -13,29 +12,42 @@ from .models import Category, Item, Basket
 
 from django.http import JsonResponse
 
+@login_required
 def add_to_basket(request):
     if request.method == 'POST':
         item_id = request.POST.get('item_id')
-        quantity = request.POST.get('quantity')
+        quantity = int(request.POST.get('quantity', 1))
 
-        # Validate input
         if not item_id or not quantity:
             return JsonResponse({'error': 'Item ID and quantity are required.'}, status=400)
 
         try:
-            # Create or update the basket item
+            item = Item.objects.get(id=item_id)
             basket_item, created = Basket.objects.get_or_create(
-                user=request.user,  # Assuming user is associated with the basket
-                item_id=item_id,
+                user=request.user,
+                item=item,
                 defaults={'quantity': quantity}
             )
 
-            # If not created, update the quantity
             if not created:
-                basket_item.quantity += int(quantity)
+                basket_item.quantity += quantity
                 basket_item.save()
 
-            return JsonResponse({'success': 'Item added to basket successfully.'})
+            basket_items = Basket.objects.filter(user=request.user)
+            basket = {
+                'items': [
+                    {
+                        'id': b.item.id,
+                        'name': b.item.name,
+                        'quantity': b.quantity,
+                        'price': b.item.price,
+                    } for b in basket_items
+                ]
+            }
+
+            return JsonResponse({'success': 'Item added to basket successfully.', 'basket': basket})
+        except Item.DoesNotExist:
+            return JsonResponse({'error': 'Item does not exist.'}, status=400)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
     else:
