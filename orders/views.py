@@ -82,6 +82,8 @@ def home_view(request):
         items = Item.objects.filter(category=category)
         category_items[category] = items
 
+    # Initialize basket_items
+    basket_items = []
     # Get basket items for the logged-in user
     if request.user.is_authenticated:
         basket_items = Basket.objects.filter(user=request.user)
