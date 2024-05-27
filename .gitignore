@@ -13,4 +13,3 @@ OrbitalBite/__init__.py
 Project Spesific
 /db.sqlite3
 /orders/migrations
-/static
