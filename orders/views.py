@@ -14,6 +14,10 @@ from django.http import JsonResponse
 
 from django.views.decorators.csrf import csrf_exempt
 
+from django.db.models import Sum
+from decimal import Decimal
+
+@csrf_exempt
 def add_to_basket(request):
     if request.method == 'POST':
         item_id = request.POST.get('item_id')
@@ -64,12 +68,19 @@ def home_view(request):
     # Get basket items for the logged-in user
     if request.user.is_authenticated:
         basket_items = Basket.objects.filter(user=request.user)
+    
+        for item in basket_items:
+            item.total_price = item.item.price * item.quantity
+    
+    checkout_price= sum(item.total_price for item in basket_items)
+    checkout_price = round(Decimal(checkout_price), 2) if checkout_price else Decimal('0.00')
 
     # Pass the categories, category-item mapping, and basket items to the template context
     context = {
         'categories': categories,
         'category_items': category_items,
-        'basket_items': basket_items if request.user.is_authenticated else None
+        'basket_items': basket_items if request.user.is_authenticated else None,
+        'checkout_price': checkout_price
     }
 
     return render(request, 'home.html', context)
