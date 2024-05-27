@@ -16,6 +16,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from django.db.models import Sum
 from decimal import Decimal
+from django.template.loader import render_to_string
 
 @csrf_exempt
 def add_to_basket(request):
@@ -35,7 +36,23 @@ def add_to_basket(request):
                 basket_item.quantity += quantity
             basket_item.save()
 
-            return JsonResponse({'status': 'success', 'message': 'Item added to basket successfully!'})
+            # Get updated basket items
+            basket_items = Basket.objects.filter(user=user)
+            for item in basket_items:
+                item.total_price = item.item.price * item.quantity
+
+            basket_html = render_to_string('basket_items.html', {'basket_items': basket_items})
+
+            # Calculate checkout_price
+            checkout_price = sum(item.total_price for item in basket_items)
+            checkout_price = round(Decimal(checkout_price), 2) if checkout_price else Decimal('0.00')
+
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Item added to basket successfully!',
+                'basket_html': basket_html,
+                'checkout_price': float(checkout_price)
+            })
         except Item.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'Item not found!'}, status=404)
 

@@ -1,4 +1,5 @@
-document.addEventListener('DOMContentLoaded', function() {
+
+/*document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.decrement-btn').forEach(button => {
         button.addEventListener('click', function() {
             const itemId = this.getAttribute('data-item-id');
@@ -23,3 +24,4 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+*/

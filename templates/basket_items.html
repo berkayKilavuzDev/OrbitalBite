@@ -1,0 +1,27 @@
+{% for basket_item in basket_items %}
+<li class="list-group-item">
+    <div class="row">
+        <!-- First Row: Name -->
+        <div class="col-12">
+            <span>{{ basket_item.item.name }}</span>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <!-- Second Row: Quantity controls and Price -->
+        <div class="col-6">
+            <div class="input-group input-group-sm">
+                <div class="input-group-prepend">
+                    <button class="btn btn-outline-secondary text-center decrement-btn" type="button" data-item-id="{{ basket_item.item.id }}" style="width: 25px;">-</button>
+                </div>
+                <input type="number" name="quantity" class="form-control text-center quantity-input" value="{{ basket_item.quantity }}" id="quantity-input-{{ basket_item.item.id }}">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary text-center increment-btn" type="button" data-item-id="{{ basket_item.item.id }}" style="width: 25px;">+</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 d-flex justify-content-end align-items-center">
+            <p class="">£ {{ basket_item.total_price }}</p>
+        </div>
+    </div>
+</li>
+{% endfor %}
