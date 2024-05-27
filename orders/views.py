@@ -58,7 +58,41 @@ def add_to_basket(request):
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request!'}, status=400)
 
+@csrf_exempt
+def update_basket(request):
+    if request.method == 'POST':
+        item_id = request.POST.get('item_id')
+        quantity = int(request.POST.get('quantity'))
 
+        try:
+            user = request.user
+
+            # Check if the item is already in the user's basket
+            basket_item = Basket.objects.get(user=user, id=item_id)            
+            basket_item.quantity = quantity           
+            basket_item.save()
+
+            # Get updated basket items
+            basket_items = Basket.objects.filter(user=user)
+            for item in basket_items:
+                item.total_price = item.item.price * item.quantity
+
+            basket_html = render_to_string('basket_items.html', {'basket_items': basket_items})
+
+            # Calculate checkout_price
+            checkout_price = sum(item.total_price for item in basket_items)
+            checkout_price = round(Decimal(checkout_price), 2) if checkout_price else Decimal('0.00')
+
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Item added to basket successfully!',
+                'basket_html': basket_html,
+                'checkout_price': float(checkout_price)
+            })
+        except Item.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Item not found!'}, status=404)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request!'}, status=400)
 
 def signup(request):
     if request.method == 'POST':

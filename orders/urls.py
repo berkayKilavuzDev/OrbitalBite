@@ -22,4 +22,5 @@ urlpatterns = [
     
     
     path('add-to-basket/', views.add_to_basket, name='add_to_basket'),
+    path('update-basket/', views.update_basket, name='update_basket'),
 ]

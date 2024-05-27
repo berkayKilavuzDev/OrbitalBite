@@ -8,14 +8,14 @@
     </div>
     <div class="row mt-2">
         <!-- Second Row: Quantity controls and Price -->
-        <div class="col-6">
+        <div class="col-4 col-md-6">
             <div class="input-group input-group-sm">
                 <div class="input-group-prepend">
-                    <button class="btn btn-outline-secondary text-center decrement-btn" type="button" data-item-id="{{ basket_item.item.id }}" style="width: 25px;">-</button>
+                    <button class="btn btn-outline-secondary text-center decrement-btn-basket" type="button" data-item-id="{{ basket_item.id }}" style="width: 25px;">-</button>
                 </div>
-                <input type="number" name="quantity" class="form-control text-center quantity-input" value="{{ basket_item.quantity }}" id="quantity-input-{{ basket_item.item.id }}">
+                <input type="number" name="quantity" class="form-control text-center quantity-input" value="{{ basket_item.quantity }}" id="quantity-input-{{ basket_item.id }}">
                 <div class="input-group-append">
-                    <button class="btn btn-outline-secondary text-center increment-btn" type="button" data-item-id="{{ basket_item.item.id }}" style="width: 25px;">+</button>
+                    <button class="btn btn-outline-secondary text-center increment-btn-basket" type="button" data-item-id="{{ basket_item.id }}" style="width: 25px;">+</button>
                 </div>
             </div>
         </div>
