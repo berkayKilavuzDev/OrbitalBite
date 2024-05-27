@@ -1,11 +1,26 @@
 {% extends "base.html" %}
 
+{% load static %}
+
 {% block content %}
+    <style>
+        /* Hide the default number input arrows */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+/*
+        input[type="number"] {
+            -moz-appearance: textfield;  Firefox 
+        }*/
+    </style>    
+
     <!-- Main Content -->
     <div class="container">
         <div class="row">
             <!-- Categories -->            
-            <div class="col-md-2 mt-4">                
+            <div class="col-md-3 mt-4">                
                 <h2>Categories</h2>
                 {% for category in categories %}
                 <div class="list-group" id="categories">
@@ -27,9 +42,21 @@
                             <p class="card-text">{{ item.price }}</p>
                             <form method="post" id="add-to-cart-form-{{ item.id }}">
                                 {% csrf_token %}
+            
                                 <input type="hidden" name="item_id" value="{{ item.id }}">
-                                <input type="hidden" name="quantity" value="1"> <!-- Assuming you're adding one item by default -->
-                                <button type="button" class="btn btn-primary add-to-cart-btn" data-item-id="{{ item.id }}">Add to Cart</button>
+            
+                                <div class="d-flex align-items-center">
+                                    <div class="input-group quantity-group">
+                                        <div class="input-group-prepend">
+                                            <button type="button" class="btn btn-outline-secondary decrement-btn" data-item-id="{{ item.id }}">-</button>
+                                        </div>
+                                        <input type="number" name="quantity" class="col-2 form-control text-center quantity-input" value="1" id="quantity-input-{{ item.id }}">
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-outline-secondary increment-btn" data-item-id="{{ item.id }}">+</button>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-primary add-to-cart-btn ml-2" data-item-id="{{ item.id }}">Add to Cart</button>
+                                </div>
                             </form>
                         </div>                        
                     </div>
@@ -39,106 +66,48 @@
             </div>
 
             <!-- Basket -->
-            <div class="col-md-4 mt-4">
+            <div class="col-md-3 mt-4">
                 <h2>Basket</h2>
                 <div class="card">
                     <ul class="list-group list-group-flush" id="basket-items">
                         <!-- Basket items will be dynamically added here -->
                         {% for basket_item in basket_items %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <div class="d-flex flex-column col-md-6">
-                                <span>{{ basket_item.item.name }}</span>
-                            </div>
-                            <div class="input-group input-group-sm">
-                                <div class="input-group-prepend">
-                                    <button class="btn btn-outline-secondary" type="button">-</button>
+                        <li class="list-group-item">
+                            <div class="row">
+                                <!-- First Row: Name -->
+                                <div class="col-12">
+                                    <span>{{ basket_item.item.name }}</span>
                                 </div>
-                                <span class="badge badge-pill mx-2" style="line-height: 2;">{{ basket_item.quantity }}</span>
-                                <div class="input-group-append">
-                                    <button class="btn btn-outline-secondary" type="button">+</button>
+                            </div>                            
+                            <div class="row mt-2">
+                                <!-- Second Row: Quantity controls and Price -->
+                                <div class="col-6">
+                                    <div class="input-group input-group-sm">
+                                        <div class="input-group-prepend">
+                                            <button class="btn btn-outline-secondary text-center" type="button" data-item-id="{{ item.id }}" style="width: 25px;">-</button>
+                                        </div>
+                                        <input type="number" name="quantity" class="form-control text-center quantity-input" value="{{ basket_item.quantity }}" id="quantity-input-{{ item.id }}">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary text-center" type="button" data-item-id="{{ item.id }}" style="width: 25px;">+</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 d-flex justify-content-end align-items-center">
+                                    <p class="">£ 32.00</p>
                                 </div>
                             </div>
-                            <span class="badge badge-success">{{ basket_item.item.price }}</span>
                         </li>
                         {% endfor %}
                     </ul>
                     
                     <div class="card-footer d-flex justify-content-between align-items-center">
                         <a href="#" class="btn btn-primary">Checkout</a>
-                        <h5 class="card-title mt-2 ml-1">Total: $32.00</h5>                
+                        <h5 class="card-title mt-2 ml-1">Total: <br>£ 32.00</h5>                
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
-    
-            addToCartButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    const itemId = button.getAttribute('data-item-id');
-                    const form = document.querySelector(`#add-to-cart-form-${itemId}`);
-                    const quantity = form.querySelector('[name="quantity"]').value;
-                    addToCart(itemId, quantity);
-                });
-            });
-    
-            function addToCart(itemId, quantity) {
-                const formData = new FormData();
-                formData.append('item_id', itemId);
-                formData.append('quantity', quantity);
-    
-                fetch('{% url "add_to_basket" %}', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}',
-                    },
-                    body: formData,
-                })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    } else {
-                        throw new Error('Failed to add item to cart');
-                    }
-                })
-                .then(data => {
-                    if (data.basket) {
-                        updateBasketUI(data.basket.items);
-                    }
-                })
-                .catch(error => {
-                    console.error(error);
-                });
-            }
-
-            function updateBasketUI(items) {
-                const basketItemsContainer = document.getElementById('basket-items');
-                basketItemsContainer.innerHTML = '';
-
-                items.forEach(item => {
-                    const li = document.createElement('li');
-                    li.className = 'list-group-item d-flex justify-content-between align-items-center';
-                    li.innerHTML = `
-                        <div class="d-flex flex-column col-md-6">
-                            <span>${item.name}</span>
-                        </div>
-                        <div class="input-group input-group-sm">
-                            <div class="input-group-prepend">
-                                <button class="btn btn-outline-secondary" type="button">-</button>
-                            </div>
-                            <span class="badge badge-pill mx-2" style="line-height: 2;">${item.quantity}</span>
-                            <div class="input-group-append">
-                                <button class="btn btn-outline-secondary" type="button">+</button>
-                            </div>
-                        </div>
-                        <span class="badge badge-success">${item.price}</span>
-                    `;
-                    basketItemsContainer.appendChild(li);
-                });
-            }
-        });
-    </script>
+    <script src="{% static 'js/quantity-controls.js' %}"></script>
+    <script src="{% static 'js/add-to-cart.js' %}"></script>
 {% endblock %}

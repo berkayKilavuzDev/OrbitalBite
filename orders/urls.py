@@ -21,5 +21,5 @@ urlpatterns = [
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='registration/custom_reset_complete.html'), name='password_reset_complete'),
     
     
-    path('add_to_basket/', views.add_to_basket, name='add_to_basket'),
+    path('add-to-basket/', views.add_to_basket, name='add_to_basket'),
 ]

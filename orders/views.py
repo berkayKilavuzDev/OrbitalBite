@@ -12,46 +12,32 @@ from .models import Category, Item, Basket
 
 from django.http import JsonResponse
 
-@login_required
+from django.views.decorators.csrf import csrf_exempt
+
 def add_to_basket(request):
     if request.method == 'POST':
         item_id = request.POST.get('item_id')
-        quantity = int(request.POST.get('quantity', 1))
-
-        if not item_id or not quantity:
-            return JsonResponse({'error': 'Item ID and quantity are required.'}, status=400)
+        quantity = int(request.POST.get('quantity'))
 
         try:
             item = Item.objects.get(id=item_id)
-            basket_item, created = Basket.objects.get_or_create(
-                user=request.user,
-                item=item,
-                defaults={'quantity': quantity}
-            )
+            user = request.user
 
-            if not created:
+            # Check if the item is already in the user's basket
+            basket_item, created = Basket.objects.get_or_create(user=user, item=item)
+            if created:
+                basket_item.quantity = quantity
+            else:
                 basket_item.quantity += quantity
-                basket_item.save()
+            basket_item.save()
 
-            basket_items = Basket.objects.filter(user=request.user)
-            basket = {
-                'items': [
-                    {
-                        'id': b.item.id,
-                        'name': b.item.name,
-                        'quantity': b.quantity,
-                        'price': b.item.price,
-                    } for b in basket_items
-                ]
-            }
-
-            return JsonResponse({'success': 'Item added to basket successfully.', 'basket': basket})
+            return JsonResponse({'status': 'success', 'message': 'Item added to basket successfully!'})
         except Item.DoesNotExist:
-            return JsonResponse({'error': 'Item does not exist.'}, status=400)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
-    else:
-        return JsonResponse({'error': 'Invalid request method.'}, status=405)
+            return JsonResponse({'status': 'error', 'message': 'Item not found!'}, status=404)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request!'}, status=400)
+
+
 
 def signup(request):
     if request.method == 'POST':

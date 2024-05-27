@@ -15,8 +15,9 @@ class Category(models.Model):
 class Item(models.Model):
     name = models.CharField(max_length=100)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    stock = models.PositiveIntegerField(default=0)
-    options = models.CharField(max_length=100, blank=True, null=True)
+    isAvailable = models.BooleanField(default=1)
+    photo = models.ImageField(null=True)
+    options = models.CharField(max_length=100, blank=True, null=True) #this needs to be well defined
     description = models.TextField(blank=True, null=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='items')
     created_at = models.DateTimeField(default=timezone.now)
@@ -28,7 +29,7 @@ class Item(models.Model):
 class Basket(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField()
+    quantity = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return f"{self.item} ({self.quantity})"
