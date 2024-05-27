@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Function to add event listeners for increment and decrement buttons in the basket
+    // Function to add event listeners for increment, decrement buttons, and delete buttons in the basket
     function addBasketEventListeners() {
         document.querySelectorAll('.increment-btn-basket').forEach(button => {
             button.addEventListener('click', function() {
@@ -67,6 +67,68 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         });
+
+        document.querySelectorAll('.quantity-input').forEach(input => {
+            input.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    const itemId = this.getAttribute('data-item-id');
+                    let quantity = parseInt(this.value);
+                    if (quantity < 1) {
+                        quantity = 1; // Ensure quantity is at least 1
+                        this.value = quantity;
+                    }
+                    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+                    fetch('/update-basket/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRFToken': csrfToken
+                        },
+                        body: new URLSearchParams({
+                            'item_id': itemId,
+                            'quantity': quantity
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            updateBasket(data.basket_html, data.checkout_price);
+                        } else {
+                            alert(data.message);
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                }
+            });
+        });
+
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const itemId = this.getAttribute('data-item-id');
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+                fetch('/delete-from-basket/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: new URLSearchParams({
+                        'item_id': itemId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        updateBasket(data.basket_html, data.checkout_price);
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
     }
 
     // Initial setup
@@ -95,8 +157,10 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.add-to-cart-btn').forEach(button => {
         button.addEventListener('click', function() {
             const itemId = this.getAttribute('data-item-id');
+            console.log('Item ID:', itemId);
             const quantityInput = document.getElementById(`quantity-input-${itemId}`);
             const quantity = parseInt(quantityInput.value);
+            console.log('Current quantity:', quantity);
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
             fetch('/add-to-basket/', {

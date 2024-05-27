@@ -1,9 +1,14 @@
 {% for basket_item in basket_items %}
 <li class="list-group-item">
     <div class="row">
-        <!-- First Row: Name -->
-        <div class="col-12">
+        <!-- First Row: Name and Close Button -->
+        <div class="col-10">
             <span>{{ basket_item.item.name }}</span>
+        </div>
+        <div class="col-2 text-right">
+            <button type="button" class="close delete-btn" aria-label="Close" data-item-id="{{ basket_item.id }}">
+                <span aria-hidden="true">&times;</span>
+            </button>
         </div>
     </div>
     <div class="row mt-2">
@@ -13,7 +18,7 @@
                 <div class="input-group-prepend">
                     <button class="btn btn-outline-secondary text-center decrement-btn-basket" type="button" data-item-id="{{ basket_item.id }}" style="width: 25px;">-</button>
                 </div>
-                <input type="number" name="quantity" class="form-control text-center quantity-input" value="{{ basket_item.quantity }}" id="quantity-input-{{ basket_item.id }}">
+                <input type="number" name="quantity" class="form-control text-center quantity-input" data-item-id="{{ basket_item.id }}" value="{{ basket_item.quantity }}" id="quantity-input-{{ basket_item.id }}">
                 <div class="input-group-append">
                     <button class="btn btn-outline-secondary text-center increment-btn-basket" type="button" data-item-id="{{ basket_item.id }}" style="width: 25px;">+</button>
                 </div>

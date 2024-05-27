@@ -18,6 +18,44 @@ from django.db.models import Sum
 from decimal import Decimal
 from django.template.loader import render_to_string
 
+
+
+@csrf_exempt
+def delete_from_basket(request):
+    if request.method == 'POST':
+        item_id = request.POST.get('item_id')
+
+        try:
+            user = request.user
+
+            # Delete the item from the user's basket
+            basket_item = Basket.objects.get(user=user, id=item_id)
+            basket_item.delete()
+
+            # Get updated basket items
+            basket_items = Basket.objects.filter(user=user)
+            for item in basket_items:
+                item.total_price = item.item.price * item.quantity
+
+            basket_html = render_to_string('basket_items.html', {'basket_items': basket_items})
+
+            # Calculate checkout_price
+            checkout_price = sum(item.total_price for item in basket_items)
+            checkout_price = round(Decimal(checkout_price), 2) if checkout_price else Decimal('0.00')
+
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Item added to basket successfully!',
+                'basket_html': basket_html,
+                'checkout_price': float(checkout_price)
+            })
+
+            return JsonResponse({'status': 'success', 'basket_html': basket_html, 'checkout_price': checkout_price})
+        except Basket.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Item not found in the basket'})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+
+
 @csrf_exempt
 def add_to_basket(request):
     if request.method == 'POST':
