@@ -16,7 +16,7 @@ class Item(models.Model):
     name = models.CharField(max_length=100)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     isAvailable = models.BooleanField(default=1)
-    photo = models.ImageField(null=True)
+    photo = models.ImageField(blank=True, null=True)
     #options = models.CharField(max_length=100, blank=True, null=True) #this needs to be well defined
     description = models.TextField(blank=True, null=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='items')
