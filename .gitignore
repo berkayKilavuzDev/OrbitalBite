@@ -11,5 +11,5 @@ OrbitalBite/__init__.py
 /req.txt
 
 Project Spesific
-#db.sqlite3
-#orders/migrations
+/db.sqlite3
+/orders/migrations
