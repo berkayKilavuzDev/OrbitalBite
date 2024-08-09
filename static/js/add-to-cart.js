@@ -162,12 +162,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const hasOption = this.getAttribute('data-option-status');
             console.log('hasOption:', hasOption);
 
-            if (hasOption) {
-                // If hasOption is 1, do nothing
+            if (hasOption === 'True') {
                 console.log('Item has options, not adding to cart directly.');
-                //$('#exampleModal').modal('show');
+                $('#exampleModal').modal('show');
                 return;
-            }
+            }            
 
             const quantityInput = document.getElementById(`quantity-input-${itemId}`);
             const quantity = parseInt(quantityInput.value);
