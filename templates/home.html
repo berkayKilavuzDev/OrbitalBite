@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+    <style>
+        /* Hide the default number input arrows */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+/*
+        input[type="number"] {
+            -moz-appearance: textfield;  Firefox 
+        }*/
+    </style>    
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="row">
+            <!-- Categories -->            
+            <div class="col-md-3 mt-4">                
+                <h2>Categories</h2>
+                {% for category in categories %}
+                <div class="list-group" id="categories">
+                    <a href="#{{ category.name }}" class="list-group-item list-group-item-action">{{ category.name }}</a>
+                </div>
+                {% endfor %}
+            </div>            
+            <!-- Menu Items -->
+            <div class="col-md-6 mt-4">
+                <h2>Menu</h2>
+                {% for category in categories %}
+                <div class="container category" id="{{ category.name }}">
+                    <hr>
+                    <h4>{{ category.name }}</h4>
+                    {% for item in category.items.all %}
+                    <div class="card mb-3">                        
+                        <div class="card-body">
+                            <h5 class="card-title">{{ item.name }}</h5>
+                            <p class="card-text">{{ item.price }}</p>
+                            <form method="post" id="add-to-cart-form-{{ item.id }}">
+                                {% csrf_token %}
+            
+                                <input type="hidden" name="item_id" value="{{ item.id }}">
+            
+                                <div class="d-flex align-items-center">
+                                    <div class="input-group quantity-group">
+                                        <div class="input-group-prepend">
+                                            <button type="button" class="btn btn-outline-secondary decrement-btn" data-item-id="{{ item.id }}">-</button>
+                                        </div>
+                                        <input type="number" name="quantity" class="col-2 form-control text-center quantity-input" value="1" id="quantity-input-{{ item.id }}">
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-outline-secondary increment-btn" data-item-id="{{ item.id }}">+</button>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-primary add-to-cart-btn ml-2" data-item-id="{{ item.id }}">Add to Cart</button>
+                                </div>
+                            </form>
+                        </div>                        
+                    </div>
+                    {% endfor %}
+                </div>  
+                {% endfor %}              
+            </div>
+
+            <!-- Basket -->
+            <div class="col-md-3 mt-4">
+                <h2>Basket</h2>
+                <div class="card">
+                    <ul class="list-group list-group-flush" id="basket-items">
+                        {% include 'basket_items.html' %}
+                    </ul>
+
+                    <div class="card-footer d-flex justify-content-between align-items-center">
+                        <a href="#" class="btn btn-primary">Checkout</a>
+                        <h5 class="card-title mt-2 ml-1">Total: <br>£ {{ checkout_price }}</h5>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script src="{% static 'js/quantity-controls.js' %}"></script>
+    <script src="{% static 'js/add-to-cart.js' %}"></script>
+{% endblock %}

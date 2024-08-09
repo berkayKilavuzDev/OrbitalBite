@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <!-- Main Content -->
+    <div class="container mt-4" style="max-width: 1000px;">
+        <!-- Personal Data Section -->
+        <h2>Personal Data</h2>
+        <form>
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="first_name">First Name</label>
+                        <input type="text" class="form-control" id="first_name" placeholder="Enter your first name">
+                    </div>
+                    <div class="form-group">
+                        <label for="street_name">Street Name and Number</label>
+                        <input type="text" class="form-control" id="street_name" placeholder="Enter your street name and number">
+                    </div>
+                    <div class="form-group">
+                        <label for="postcode">Postcode</label>
+                        <input type="text" class="form-control" id="postcode" placeholder="Enter your postcode">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">E-mail</label>
+                        <input type="email" class="form-control" id="email" placeholder="Enter your email">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="last_name">Last Name</label>
+                        <input type="text" class="form-control" id="last_name" placeholder="Enter your last name">
+                    </div>
+                    <div class="form-group">
+                        <label for="floor_apartment">Floor/Apartment Number</label>
+                        <input type="text" class="form-control" id="floor_apartment" placeholder="Enter your floor/apartment number">
+                    </div>
+                    <div class="form-group">
+                        <label for="phone_number">Phone Number</label>
+                        <input type="tel" class="form-control" id="phone_number" placeholder="Enter your phone number">
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="col-10 btn btn-primary p-2 mt-3 mb-3">Update</button>
+            </div>            
+        </form>
+
+        <!-- Change Password Section -->
+        <h2 class="mt-4">Change Password</h2>
+        <p>Update your password to keep your account secure!</p>
+        <div class="text-center">
+            <button type="button" class="col-10 btn btn-primary p-2 mt-1">Update Password</button>
+        </div>
+
+        <!-- News and Offers Options Section -->
+        <h2 class="mt-5">News and Offer Options</h2>
+        <p>I would like to receive news and offers by:</p>
+        <form>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="sms">
+                <label class="form-check-label" for="sms">SMS Text Message</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="email_news">
+                <label class="form-check-label" for="email_news">E-mail</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="push_notifications">
+                <label class="form-check-label" for="push_notifications">Push Notifications</label>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="col-10 btn btn-primary p-2 mt-4">Update</button>
+            </div>
+        </form>
+
+        <!-- Delete Profile Section -->
+        <div class="mt-4 text-center">
+            <button type="button" class="col-10 btn btn-transparent">Delete Profile</button>
+        </div>
+    </div>
+
+{% endblock %}

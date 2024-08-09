@@ -1,14 +1,15 @@
-/db.sqlite3
 /workArea.ipynb
-/media
-/static
 
-/accounts/__pycache__
-/events/__pycache__
-/davetlisiniz/__pycache__
+OrbitalBite/__pycache__
+OrbitalBite/__init__.py
+/orders/__pycache__
 
-/accounts/migrations
-/events/migrations
+
+/orders/__init__.py
+/orders/emailfolder
 
 /req.txt
 
+Project Spesific
+/db.sqlite3
+/orders/migrations
