@@ -158,6 +158,17 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', function() {
             const itemId = this.getAttribute('data-item-id');
             console.log('Item ID:', itemId);
+
+            const hasOption = this.getAttribute('data-option-status');
+            console.log('hasOption:', hasOption);
+
+            if (hasOption) {
+                // If hasOption is 1, do nothing
+                console.log('Item has options, not adding to cart directly.');
+                //$('#exampleModal').modal('show');
+                return;
+            }
+
             const quantityInput = document.getElementById(`quantity-input-${itemId}`);
             const quantity = parseInt(quantityInput.value);
             console.log('Current quantity:', quantity);

@@ -8,7 +8,7 @@ from django.contrib.auth import login
 from .forms import CustomUserCreationForm
 
 from django.contrib.auth.decorators import login_required
-from .models import Category, Item, Basket
+from .models import Category, Item, Basket, Option
 
 from django.http import JsonResponse
 
@@ -146,6 +146,9 @@ def signup(request):
 def home_view(request):
     # Retrieve all categories
     categories = Category.objects.all()
+    
+    # Retrieve all options
+    options = Option.objects.all()
 
     # Create a dictionary to hold category-item mapping
     category_items = {}
@@ -171,6 +174,7 @@ def home_view(request):
         'categories': categories,
         'category_items': category_items,
         'basket_items': basket_items if request.user.is_authenticated else None,
+        'options': options,
         'checkout_price': checkout_price
     }
 
