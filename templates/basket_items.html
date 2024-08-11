@@ -11,6 +11,15 @@
             </button>
         </div>
     </div>
+    
+    {% if basket_item.option %}
+    <div class="row">
+        <div class="col-5 option-name text-muted">
+            {{ basket_item.option.option_name }}
+        </div>
+    </div>
+    {% endif %}
+
     <div class="row mt-2">
         <!-- Second Row: Quantity controls and Price -->
         <div class="col-4 col-md-6">

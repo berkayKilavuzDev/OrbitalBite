@@ -62,16 +62,25 @@ def add_to_basket(request):
         item_id = request.POST.get('item_id')
         quantity = int(request.POST.get('quantity'))
         selected_options = request.POST.get('options')
-        print(quantity)
 
         try:
             item = Item.objects.get(id=item_id)
             user = request.user
+            
 
-            # Create basket item
-            basket_item, created = Basket.objects.get_or_create(user=user, item=item)
-            basket_item.quantity += quantity
-            basket_item.save()
+            if selected_options:
+                option = Option.objects.get(id=selected_options)
+
+                # Create basket item
+                basket_item, created = Basket.objects.get_or_create(user=user, item=item, option=option)
+                basket_item.quantity += quantity
+                basket_item.save()
+            
+            else:
+                # Create basket item
+                basket_item, created = Basket.objects.get_or_create(user=user, item=item)
+                basket_item.quantity += quantity
+                basket_item.save()
 
             # Add selected options to the basket item
             if selected_options:

@@ -50,5 +50,9 @@ class Basket(models.Model):
     updated_at = models.DateTimeField(auto_now=True, null=True)
 
     def __str__(self):
-        return f"{self.item}({self.option.option_name}) - {self.quantity}"
+        if self.option:
+            return f"{self.item}({self.option.option_name}) - {self.quantity}"
+        else:
+            return f"{self.item} - {self.quantity}"
         #return f'{self.user.first_name}\'s Basket'
+        #return f"{self.item} - {self.quantity}"
