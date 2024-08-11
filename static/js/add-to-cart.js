@@ -154,53 +154,82 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    document.querySelectorAll('.add-to-cart-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const itemId = this.getAttribute('data-item-id');
-            console.log('Item ID:', itemId);
-
-            const hasOption = this.getAttribute('data-option-status');
-            console.log('hasOption:', hasOption);
-
-            if (hasOption === 'True') {
-                console.log('Item has options, not adding to cart directly.');
-                $('#exampleModal').modal('show');
-                return;
-            }            
-
-            const quantityInput = document.getElementById(`quantity-input-${itemId}`);
-            const quantity = parseInt(quantityInput.value);
-            console.log('Current quantity:', quantity);
-            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-
-            fetch('/add-to-basket/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': csrfToken
-                },
-                body: new URLSearchParams({
-                    'item_id': itemId,
-                    'quantity': quantity
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    updateBasket(data.basket_html, data.checkout_price);
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        });
-    });
-
     function updateBasket(basketHTML, checkoutPrice) {
         document.getElementById('basket-items').innerHTML = basketHTML;
         const checkoutPriceElement = document.querySelector('.card-footer h5');
         checkoutPriceElement.innerHTML = `Total: <br>£ ${checkoutPrice.toFixed(2)}`;
-        // Reattach event listeners for new basket elements
-        addBasketEventListeners();
+        addBasketEventListeners();  // Reattach event listeners for new basket elements
+    }
+
+    document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const itemId = this.getAttribute('data-item-id');
+            const hasOption = this.getAttribute('data-option-status') === 'True';
+
+            if (hasOption) {
+                fetch(`/get-options/${itemId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const optionsContainer = document.getElementById('options-container');
+                        optionsContainer.innerHTML = ''; // Clear existing options
+                        data.options.forEach(option => {
+                            const optionElement = document.createElement('div');
+                            optionElement.classList.add('form-check');
+                            optionElement.innerHTML = `
+                                <input class="form-check-input" type="checkbox" value="${option.id}" id="option-${option.id}">
+                                <label class="form-check-label" for="option-${option.id}">
+                                    ${option.option_name} (£${option.price})
+                                </label>
+                            `;
+                            optionsContainer.appendChild(optionElement);
+                        });
+                        $('#exampleModal').modal('show');
+                    } else {
+                        alert('Error fetching options!');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            } else {
+                const selectedOptions = [];
+                addItemToCart(itemId, 1, selectedOptions);
+            }
+        });
+    });
+
+    document.getElementById('save-options-btn').addEventListener('click', function() {
+        const itemId = document.querySelector('.add-to-cart-btn').getAttribute('data-item-id');
+        const selectedOptions = [];
+        document.querySelectorAll('#options-container input[type="checkbox"]:checked').forEach(checkbox => {
+            selectedOptions.push(checkbox.value);
+        });
+        addItemToCart(itemId, 1, selectedOptions);
+        $('#exampleModal').modal('hide');
+    });
+
+    function addItemToCart(itemId, quantity, options) {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        fetch('/add-to-basket/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': csrfToken
+            },
+            body: new URLSearchParams({
+                'item_id': itemId,
+                'quantity': quantity,
+                'options': options
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                updateBasket(data.basket_html, data.checkout_price);
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => console.error('Error:', error));
     }
 });

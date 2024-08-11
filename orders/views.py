@@ -61,18 +61,25 @@ def add_to_basket(request):
     if request.method == 'POST':
         item_id = request.POST.get('item_id')
         quantity = int(request.POST.get('quantity'))
+        selected_options = request.POST.get('options')
 
         try:
             item = Item.objects.get(id=item_id)
             user = request.user
 
-            # Check if the item is already in the user's basket
+            # Create basket item
             basket_item, created = Basket.objects.get_or_create(user=user, item=item)
-            if created:
-                basket_item.quantity = quantity
-            else:
-                basket_item.quantity += quantity
+            basket_item.quantity += quantity
             basket_item.save()
+
+            # Add selected options to the basket item
+            if selected_options:
+                for option_id in selected_options:
+                    option = Option.objects.get(id=option_id)
+                    basket_item.option = option
+                    basket_item.save()
+            else:
+                basket_item.save()            
 
             # Get updated basket items
             basket_items = Basket.objects.filter(user=user)
@@ -95,6 +102,7 @@ def add_to_basket(request):
             return JsonResponse({'status': 'error', 'message': 'Item not found!'}, status=404)
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request!'}, status=400)
+
 
 @csrf_exempt
 def update_basket(request):
@@ -203,3 +211,19 @@ def order_history(request):
         # Add other context variables as needed
     }
     return render(request, 'order_history.html', context)
+
+from django.http import JsonResponse
+
+def get_options(request, item_id):
+    try:
+        item = Item.objects.get(id=item_id)
+        options = item.option_set.all()  # Assuming Option model has a ForeignKey to Item
+        
+        options_data = [{'id': option.id, 'option_name': option.option_name, 'price': option.price} for option in options]
+        
+        return JsonResponse({
+            'status': 'success',
+            'options': options_data
+        })
+    except Item.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Item not found!'}, status=404)
