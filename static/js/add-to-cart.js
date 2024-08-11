@@ -181,13 +181,16 @@ document.addEventListener('DOMContentLoaded', function() {
                             const optionElement = document.createElement('div');
                             optionElement.classList.add('form-check');
                             optionElement.innerHTML = `
-                                <input class="form-check-input" type="checkbox" value="${option.id}" id="option-${option.id}">
+                                <input class="form-check-input" type="radio" value="${option.id}" id="option-${option.id}">
                                 <label class="form-check-label" for="option-${option.id}">
                                     ${option.option_name} (£${option.price})
                                 </label>
                             `;
                             optionsContainer.appendChild(optionElement);
                         });
+
+                        document.getElementById('exampleModalLabel').textContent = `Select ${data.options[0].option_name}`;
+
                         $('#exampleModal').modal('show');
                     } else {
                         alert('Error fetching options!');
@@ -206,11 +209,20 @@ document.addEventListener('DOMContentLoaded', function() {
         const quantityInput = document.getElementById(`quantity-input-${itemId}`);
         const quantity = parseInt(quantityInput.value);
         const selectedOptions = [];
-        document.querySelectorAll('#options-container input[type="checkbox"]:checked').forEach(checkbox => {
-            selectedOptions.push(checkbox.value);
+        document.querySelectorAll('#options-container input[type="radio"]:checked').forEach(radio => {
+            selectedOptions.push(radio.value);
         });
-        addItemToCart(itemId, quantity, selectedOptions);
-        $('#exampleModal').modal('hide');
+
+
+        if (selectedOptions.length > 0) {
+            // Hide the warning message if any option is selected
+            document.getElementById('option-warning').style.display = 'none';
+            addItemToCart(itemId, quantity, selectedOptions);
+            $('#exampleModal').modal('hide');
+        } else {
+            // Show the warning message if no options are selected
+            document.getElementById('option-warning').style.display = 'block';
+        }
     });
 
     function addItemToCart(itemId, quantity, options) {
