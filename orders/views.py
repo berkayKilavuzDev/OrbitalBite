@@ -62,6 +62,7 @@ def add_to_basket(request):
         item_id = request.POST.get('item_id')
         quantity = int(request.POST.get('quantity'))
         selected_options = request.POST.get('options')
+        print(quantity)
 
         try:
             item = Item.objects.get(id=item_id)

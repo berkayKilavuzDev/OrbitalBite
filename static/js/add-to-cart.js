@@ -166,6 +166,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const itemId = this.getAttribute('data-item-id');
             const hasOption = this.getAttribute('data-option-status') === 'True';
 
+            const quantityInput = document.getElementById(`quantity-input-${itemId}`);
+            const quantity = parseInt(quantityInput.value);
+            console.log('Current quantity:', quantity);
+
             if (hasOption) {
                 fetch(`/get-options/${itemId}/`)
                 .then(response => response.json())
@@ -192,18 +196,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 .catch(error => console.error('Error:', error));
             } else {
                 const selectedOptions = [];
-                addItemToCart(itemId, 1, selectedOptions);
+                addItemToCart(itemId, quantity, selectedOptions);
             }
         });
     });
 
     document.getElementById('save-options-btn').addEventListener('click', function() {
         const itemId = document.querySelector('.add-to-cart-btn').getAttribute('data-item-id');
+        const quantityInput = document.getElementById(`quantity-input-${itemId}`);
+        const quantity = parseInt(quantityInput.value);
         const selectedOptions = [];
         document.querySelectorAll('#options-container input[type="checkbox"]:checked').forEach(checkbox => {
             selectedOptions.push(checkbox.value);
         });
-        addItemToCart(itemId, 1, selectedOptions);
+        addItemToCart(itemId, quantity, selectedOptions);
         $('#exampleModal').modal('hide');
     });
 
