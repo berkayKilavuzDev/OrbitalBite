@@ -177,19 +177,28 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (data.status === 'success') {
                         const optionsContainer = document.getElementById('options-container');
                         optionsContainer.innerHTML = ''; // Clear existing options
+
                         data.options.forEach(option => {
-                            const optionElement = document.createElement('div');
-                            optionElement.classList.add('form-check');
-                            optionElement.innerHTML = `
-                                <input class="form-check-input" type="radio" value="${option.id}" id="option-${option.id}">
-                                <label class="form-check-label" for="option-${option.id}">
-                                    ${option.option_name} (£${option.price})
-                                </label>
-                            `;
-                            optionsContainer.appendChild(optionElement);
+                            const optionGroupElement = document.createElement('div');
+                            optionGroupElement.classList.add('option-group');
+                            optionGroupElement.innerHTML = `<strong>${option.option_name}:</strong>`;
+                            
+                            option.details.forEach(detail => {
+                                const optionDetailElement = document.createElement('div');
+                                optionDetailElement.classList.add('form-check');
+                                optionDetailElement.innerHTML = `
+                                    <input class="form-check-input" type="radio" name="option-${option.id}" value="${detail.id}" id="optionDetail-${detail.id}">
+                                    <label class="form-check-label" for="optionDetail-${detail.id}">
+                                        ${detail.optionDetail_name} (£${detail.price})
+                                    </label>
+                                `;
+                                optionGroupElement.appendChild(optionDetailElement);
+                            });
+
+                            optionsContainer.appendChild(optionGroupElement);
                         });
 
-                        document.getElementById('exampleModalLabel').textContent = `Select ${data.options[0].option_name}`;
+                        document.getElementById('exampleModalLabel').textContent = `${itemId.name}`;
 
                         $('#exampleModal').modal('show');
                     } else {
@@ -212,6 +221,8 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('#options-container input[type="radio"]:checked').forEach(radio => {
             selectedOptions.push(radio.value);
         });
+
+        console.log(selectedOptions);
 
 
         if (selectedOptions.length > 0) {

@@ -8,7 +8,7 @@ from django.contrib.auth import login
 from .forms import CustomUserCreationForm
 
 from django.contrib.auth.decorators import login_required
-from .models import Category, Item, Basket, Option
+from .models import Category, Item, Basket, Option, OptionDetail
 
 from django.http import JsonResponse
 
@@ -60,36 +60,53 @@ def delete_from_basket(request):
 def add_to_basket(request):
     if request.method == 'POST':
         item_id = request.POST.get('item_id')
-        quantity = int(request.POST.get('quantity'))
-        selected_options = request.POST.get('options')
+        quantity = int(request.POST.get('quantity', 1))
+        selected_options = request.POST.get('options')  # This is a string like "1,3"
 
         try:
             item = Item.objects.get(id=item_id)
             user = request.user
-            
 
             if selected_options:
-                option = Option.objects.get(id=selected_options)
+                # Convert the comma-separated string to a list of integers
+                option_ids = [int(opt_id) for opt_id in selected_options.split(',')]
 
-                # Create basket item
-                basket_item, created = Basket.objects.get_or_create(user=user, item=item, option=option)
-                basket_item.quantity += quantity
-                basket_item.save()
-            
+                # Get the corresponding OptionDetail objects
+                option_details = OptionDetail.objects.filter(id__in=option_ids)
+
+                # Find all basket items for the user with the same item
+                existing_basket_items = Basket.objects.filter(user=user, item=item)
+
+                # Flag to check if an exact match is found
+                exact_match_found = False
+
+                for basket_item in existing_basket_items:
+                    # Get the options associated with the current basket item
+                    basket_item_options = basket_item.option.all()
+
+                    # Check if the options match exactly
+                    if set(basket_item_options) == set(option_details):
+                        exact_match_found = True
+                        existing_basket_item = basket_item
+                        break
+
+                if exact_match_found:
+                    # If the exact combination exists, update the quantity
+                    existing_basket_item.quantity += quantity
+                    existing_basket_item.save()
+                else:
+                    # If no exact match is found, create a new basket item
+                    new_basket_item = Basket(user=user, item=item, quantity=quantity)
+                    new_basket_item.save()
+                    new_basket_item.option.set(option_details)
+                    new_basket_item.save()
+
             else:
-                # Create basket item
+                # If no options are selected, handle the base item without options
                 basket_item, created = Basket.objects.get_or_create(user=user, item=item)
-                basket_item.quantity += quantity
+                if not created:
+                    basket_item.quantity += quantity
                 basket_item.save()
-
-            # Add selected options to the basket item
-            if selected_options:
-                for option_id in selected_options:
-                    option = Option.objects.get(id=option_id)
-                    basket_item.option = option
-                    basket_item.save()
-            else:
-                basket_item.save()            
 
             # Get updated basket items
             basket_items = Basket.objects.filter(user=user)
@@ -98,13 +115,13 @@ def add_to_basket(request):
 
             basket_html = render_to_string('basket_items.html', {'basket_items': basket_items})
 
-            # Calculate checkout_price
+            # Calculate checkout price
             checkout_price = sum(item.total_price for item in basket_items)
             checkout_price = round(Decimal(checkout_price), 2) if checkout_price else Decimal('0.00')
 
             return JsonResponse({
                 'status': 'success',
-                'message': 'Item added to basket successfully!',
+                'message': 'Item(s) added to basket successfully!',
                 'basket_html': basket_html,
                 'checkout_price': float(checkout_price)
             })
@@ -112,6 +129,7 @@ def add_to_basket(request):
             return JsonResponse({'status': 'error', 'message': 'Item not found!'}, status=404)
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request!'}, status=400)
+
 
 
 @csrf_exempt
@@ -229,7 +247,20 @@ def get_options(request, item_id):
         item = Item.objects.get(id=item_id)
         options = item.option_set.all()  # Assuming Option model has a ForeignKey to Item
         
-        options_data = [{'id': option.id, 'option_name': option.option_name, 'price': option.price} for option in options]
+        options_data = []
+        
+        for option in options:
+            option_details = option.optiondetail_set.all()  # Get all OptionDetails associated with this option
+            option_details_data = [{'id': detail.id, 'optionDetail_name': detail.optionDetail_name, 'price': detail.price} for detail in option_details]
+            
+            options_data.append({
+                'id': option.id,
+                'option_name': option.option_name,
+                'details': option_details_data
+            })
+            
+        #options_data = [{'id': option.id, 'option_name': option.option_name, 'price': option.price} for option in options]
+        print(options_data)
         
         return JsonResponse({
             'status': 'success',

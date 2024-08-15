@@ -12,12 +12,14 @@
         </div>
     </div>
     
-    {% if basket_item.option %}
-    <div class="row">
-        <div class="col-5 option-name text-muted">
-            {{ basket_item.option.option_name }}
-        </div>
-    </div>
+    {% if basket_item.option.all %}
+        {% for option in basket_item.option.all %}
+            <div class="row">
+                <div class="col-12 option-name text-muted">
+                    {{ option.optionDetail_name }}
+                </div>
+            </div>
+        {% endfor %}
     {% endif %}
 
     <div class="row mt-2">
