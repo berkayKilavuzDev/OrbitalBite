@@ -165,6 +165,9 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', function() {
             const itemId = this.getAttribute('data-item-id');
             const hasOption = this.getAttribute('data-option-status') === 'True';
+            const itemName = this.getAttribute('data-item-name');
+
+            console.log('data-item-id:', itemId);
 
             const quantityInput = document.getElementById(`quantity-input-${itemId}`);
             const quantity = parseInt(quantityInput.value);
@@ -186,19 +189,27 @@ document.addEventListener('DOMContentLoaded', function() {
                             option.details.forEach(detail => {
                                 const optionDetailElement = document.createElement('div');
                                 optionDetailElement.classList.add('form-check');
+                                
+                                const priceText = detail.price ? ` (£${detail.price})` : ''; // Only show price if it exists
+                                
                                 optionDetailElement.innerHTML = `
                                     <input class="form-check-input" type="radio" name="option-${option.id}" value="${detail.id}" id="optionDetail-${detail.id}">
                                     <label class="form-check-label" for="optionDetail-${detail.id}">
-                                        ${detail.optionDetail_name} (£${detail.price})
+                                        ${detail.optionDetail_name}${priceText}
                                     </label>
                                 `;
+                                
                                 optionGroupElement.appendChild(optionDetailElement);
                             });
+                            
 
                             optionsContainer.appendChild(optionGroupElement);
                         });
 
-                        document.getElementById('exampleModalLabel').textContent = `${itemId.name}`;
+                        document.getElementById('exampleModalLabel').textContent = itemName;
+
+                        const modal = document.getElementById('exampleModal');
+                        modal.setAttribute('data-item-id', itemId);
 
                         $('#exampleModal').modal('show');
                     } else {
@@ -214,7 +225,11 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.getElementById('save-options-btn').addEventListener('click', function() {
-        const itemId = document.querySelector('.add-to-cart-btn').getAttribute('data-item-id');
+        //const itemId = document.querySelector('.add-to-cart-btn').getAttribute('data-item-id');
+
+        const modal = document.getElementById('exampleModal');
+        const itemId = modal.getAttribute('data-item-id');
+
         const quantityInput = document.getElementById(`quantity-input-${itemId}`);
         const quantity = parseInt(quantityInput.value);
         const selectedOptions = [];
@@ -224,8 +239,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         console.log(selectedOptions);
 
+        //const requiredOptions = document.querySelectorAll('#options-container input[type="radio"]:required');
+        const optionGroups = document.querySelectorAll('.option-group');
+        console.log(optionGroups);
 
-        if (selectedOptions.length > 0) {
+        if (selectedOptions.length === optionGroups.length) {
             // Hide the warning message if any option is selected
             document.getElementById('option-warning').style.display = 'none';
             addItemToCart(itemId, quantity, selectedOptions);
