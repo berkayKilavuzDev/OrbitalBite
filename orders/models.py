@@ -50,12 +50,17 @@ class OptionDetail(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def save(self, *args, **kwargs):
+        # Check if a parent_menuItem is selected
+        if self.parent_menuItem:
+            # Update optionDetail_name and price based on the selected parent_menuItem
+            self.optionDetail_name = self.parent_menuItem.name  # Assuming the Item model has a 'name' field
+            self.price = self.parent_menuItem.price  # Assuming the Item model has a 'price' field
+
+        super(OptionDetail, self).save(*args, **kwargs)
+
     def __str__(self):
         return f'{self.parent_option.parent_menu_item.name} - {self.parent_option.option_name} - {self.optionDetail_name} - {self.price}'
-    
-    @property
-    def parent_menu_item_price(self):
-        return self.parent_menuItem.price if self.parent_menuItem else None
 
 
 class Basket(models.Model):
@@ -66,11 +71,14 @@ class Basket(models.Model):
     #menu_item_option = models.ForeignKey(MenuItemOption, on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
-
+    
+    def get_selected_options(self):
+        return ", ".join([option.optionDetail_name for option in self.option.all()])
+    
     def __str__(self):
-        #options = ", ".join([option.optionDetail_name for option in self.option.all()])
-        #if options:
-        #    return f"{self.item.name} ({options}) - {self.quantity}"
-        #else:
-        #    return f"{self.item.name} - {self.quantity}"
-        return f"{self.item.name} - {self.quantity}"
+        options = ", ".join([option.optionDetail_name for option in self.option.all()])
+        if options:
+            return f"{self.item.name} ({options}) - {self.quantity}"
+        else:
+            return f"{self.item.name} - {self.quantity}"
+        #return f"{self.item.name} - {self.quantity}"
