@@ -11,6 +11,17 @@
             </button>
         </div>
     </div>
+    
+    {% if basket_item.option.all %}
+        {% for option in basket_item.option.all %}
+            <div class="row">
+                <div class="col-12 option-name text-muted">
+                    {{ option.optionDetail_name }}
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+
     <div class="row mt-2">
         <!-- Second Row: Quantity controls and Price -->
         <div class="col-4 col-md-6">
@@ -25,7 +36,7 @@
             </div>
         </div>
         <div class="col-6 d-flex justify-content-end align-items-center">
-            <p class="">£ {{ basket_item.total_price }}</p>
+            <p class="">£ {{ basket_item.total_price|floatformat:2 }}</p>
         </div>
     </div>
 </li>

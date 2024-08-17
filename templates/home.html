@@ -55,7 +55,30 @@
                                             <button type="button" class="btn btn-outline-secondary increment-btn" data-item-id="{{ item.id }}">+</button>
                                         </div>
                                     </div>
-                                    <button type="button" class="btn btn-primary add-to-cart-btn ml-2" data-item-id="{{ item.id }}">Add to Cart</button>
+                                    <button type="button" class="btn btn-primary add-to-cart-btn ml-2" data-item-id="{{ item.id }}" data-option-status="{{ item.hasOption }}" data-item-name="{{ item.name }}">Add to Cart</button>
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h1 class="modal-title fs-5" id="exampleModalLabel"></h1>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form id="options-form">
+                                                        <!-- Options will be dynamically inserted here -->
+                                                        <div id="options-container"></div>
+                                                        <div id="option-warning" class="text-danger" style="display:none;">
+                                                            Please select at least one option.
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-primary" id="save-options-btn">Add to Cart</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </form>
                         </div>                        
