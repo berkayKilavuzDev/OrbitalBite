@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 const optionDetailElement = document.createElement('div');
                                 optionDetailElement.classList.add('form-check');
                                 
-                                const priceText = detail.price ? ` (£${detail.price})` : ''; // Only show price if it exists
+                                const priceText = detail.price ? ` (+ £${detail.price})` : ''; // Only show price if it exists
                                 
                                 optionDetailElement.innerHTML = `
                                     <input class="form-check-input" type="radio" name="option-${option.id}" value="${detail.id}" id="optionDetail-${detail.id}">

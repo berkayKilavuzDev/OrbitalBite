@@ -43,7 +43,7 @@ class Option(models.Model):
     
 class OptionDetail(models.Model):
     parent_option = models.ForeignKey(Option, on_delete=models.CASCADE)
-    parent_menuItem = models.ForeignKey(Item, on_delete=models.CASCADE, null=True)
+    parent_menuItem = models.ForeignKey(Item, on_delete=models.CASCADE, null=True, blank=True)
     optionDetail_name = models.CharField(max_length=255, null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True,
                                 help_text="If Parent menuItem selected, leave this area blank!")
@@ -67,7 +67,7 @@ class Basket(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1) 
-    option = models.ManyToManyField(OptionDetail, null=True)
+    option = models.ManyToManyField(OptionDetail)
     #menu_item_option = models.ForeignKey(MenuItemOption, on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)

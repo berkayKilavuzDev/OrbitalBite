@@ -36,7 +36,7 @@
             </div>
         </div>
         <div class="col-6 d-flex justify-content-end align-items-center">
-            <p class="">£ {{ basket_item.total_price }}</p>
+            <p class="">£ {{ basket_item.total_price|floatformat:2 }}</p>
         </div>
     </div>
 </li>

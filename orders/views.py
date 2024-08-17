@@ -18,7 +18,7 @@ from django.db.models import Sum
 from decimal import Decimal
 from django.template.loader import render_to_string
 
-
+from django.db.models import Sum
 
 @csrf_exempt
 def delete_from_basket(request):
@@ -35,7 +35,26 @@ def delete_from_basket(request):
             # Get updated basket items
             basket_items = Basket.objects.filter(user=user)
             for item in basket_items:
-                item.total_price = item.item.price * item.quantity
+                # Base item price
+                item_price = item.item.price
+                
+                # Check if the item has selected options
+                if item.option.exists():
+                    # Get all related OptionDetails
+                    option_details = item.option.all()
+                    
+                    for option in option_details:
+                        # Check if the OptionDetail has a price
+                        if option.price:
+                            # If the OptionDetail has a parent_menuItem, add the option price to the item price
+                            if option.parent_menuItem:
+                                item_price += option.price
+                            else:
+                                # Replace item price with the option price if there's no parent_menuItem
+                                item_price = option.price
+                
+                # Calculate the total price for the basket item
+                item.total_price = item_price * item.quantity
 
             basket_html = render_to_string('basket_items.html', {'basket_items': basket_items})
 
@@ -111,7 +130,20 @@ def add_to_basket(request):
             # Get updated basket items
             basket_items = Basket.objects.filter(user=user)
             for item in basket_items:
-                item.total_price = item.item.price * item.quantity
+                # Base item price
+                item_price = item.item.price
+                
+                # Get all related OptionDetails
+                option_details = item.option.all()
+                
+                # Calculate the total price of selected options
+                total_option_price = option_details.aggregate(total_price=Sum('price'))['total_price'] or Decimal('0.00')
+                
+                # Add the total option price to the item price
+                item_price += total_option_price
+                
+                # Calculate the total price for the basket item
+                item.total_price = item_price * item.quantity
 
             basket_html = render_to_string('basket_items.html', {'basket_items': basket_items})
 
@@ -149,7 +181,26 @@ def update_basket(request):
             # Get updated basket items
             basket_items = Basket.objects.filter(user=user)
             for item in basket_items:
-                item.total_price = item.item.price * item.quantity
+                # Base item price
+                item_price = item.item.price
+                
+                # Check if the item has selected options
+                if item.option.exists():
+                    # Get all related OptionDetails
+                    option_details = item.option.all()
+                    
+                    for option in option_details:
+                        # Check if the OptionDetail has a price
+                        if option.price:
+                            # If the OptionDetail has a parent_menuItem, add the option price to the item price
+                            if option.parent_menuItem:
+                                item_price += option.price
+                            else:
+                                # Replace item price with the option price if there's no parent_menuItem
+                                item_price = option.price
+                
+                # Calculate the total price for the basket item
+                item.total_price = item_price * item.quantity
 
             basket_html = render_to_string('basket_items.html', {'basket_items': basket_items})
 
@@ -200,7 +251,26 @@ def home_view(request):
         basket_items = Basket.objects.filter(user=request.user)
     
         for item in basket_items:
-            item.total_price = item.item.price * item.quantity
+            # Base item price
+            item_price = item.item.price
+            
+            # Check if the item has selected options
+            if item.option.exists():
+                # Get all related OptionDetails
+                option_details = item.option.all()
+                
+                for option in option_details:
+                    # Check if the OptionDetail has a price
+                    if option.price:
+                        # If the OptionDetail has a parent_menuItem, add the option price to the item price
+                        if option.parent_menuItem:
+                            item_price += option.price
+                        else:
+                            # Replace item price with the option price if there's no parent_menuItem
+                            item_price = option.price
+            
+            # Calculate the total price for the basket item
+            item.total_price = item_price * item.quantity
     
     checkout_price= sum(item.total_price for item in basket_items)
     checkout_price = round(Decimal(checkout_price), 2) if checkout_price else Decimal('0.00')
