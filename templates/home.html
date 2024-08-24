@@ -90,6 +90,71 @@
 
             <!-- Basket -->
             <div class="col-md-3 mt-4">
+                <h2>Select Option</h2>
+
+                <!-- Selection field for delivery or pickup -->                
+                <!-- Selection field for delivery or pickup -->
+                <div class="container p-0 m-0">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="btn-group w-100" role="group" aria-label="Basic radio toggle button group">
+                                <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" checked>
+                                <label class="btn btn-outline-success flex-fill" for="btnradio2">Delivery</label>
+
+                                <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
+                                <label class="btn btn-outline-success flex-fill" for="btnradio3">Pick-up</label>
+                            </div>
+                            <!-- If delivery selected -->    
+                            <div id="addressField" class="form-floating d-none">
+                                <input type="text" class="form-control mt-3" id="floatingInput" placeholder="SG5 1EN, Apartment 1 Portmill Lane">
+                                <label for="floatingInput">Enter Address</label>
+
+                                <div class="input-group mb-1 mt-3">
+                                    <span class="input-group-text bg-white">
+                                        <img src="https://picsum.photos/30/30" alt="Logo" style="width: 20px; height: 20px;">
+                                    </span>
+                                    <select class="form-select border-start-0" aria-label="Default select example" id="deliveryDateSelect">
+                                        <!-- Options will be populated by JavaScript -->
+                                    </select>            
+                                </div>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white">
+                                        <img src="https://picsum.photos/30/30" alt="Logo" style="width: 20px; height: 20px;">
+                                    </span>
+                                    <select class="form-select border-start-0" aria-label="Default select example">
+                                        <option selected>ASAP (15 minutes)</option>
+                                        <option value="1">18:30</option>
+                                        <option value="2">19:00</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- If picking up from restaurant selected -->
+                            <div id="pickupField" class="d-none">
+                                <div class="input-group mb-1 mt-3">
+                                    <span class="input-group-text bg-white">
+                                        <img src="https://picsum.photos/30/30" alt="Logo" style="width: 20px; height: 20px;">
+                                    </span>
+                                    <select class="form-select border-start-0" aria-label="Default select example" id="pickupDateSelect">
+                                        <!-- Options will be populated by JavaScript -->
+                                    </select>  
+                                </div>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white">
+                                        <img src="https://picsum.photos/30/30" alt="Logo" style="width: 20px; height: 20px;">
+                                    </span>
+                                    <select class="form-select border-start-0" aria-label="Default select example">
+                                        <option selected>ASAP (15 minutes)</option>
+                                        <option value="1">18:30</option>
+                                        <option value="2">19:00</option>
+                                    </select>
+                                </div>
+                            </div> 
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
                 <h2>Basket</h2>
                 <div class="card">
                     <ul class="list-group list-group-flush" id="basket-items">
@@ -107,4 +172,5 @@
     </div>
     <script src="{% static 'js/quantity-controls.js' %}"></script>
     <script src="{% static 'js/add-to-cart.js' %}"></script>
+    <script src="{% static 'js/delivery-pickup.js' %}"></script>
 {% endblock %}
