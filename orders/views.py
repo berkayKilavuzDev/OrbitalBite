@@ -312,6 +312,18 @@ def order_history(request):
 
 from django.http import JsonResponse
 
+@login_required
+def order_complete(request):
+    # Logic to fetch user's account information
+    user = request.user
+    context = {
+        'user': user,
+        # Add other context variables as needed
+    }
+    return render(request, 'order_complete.html', context)
+
+from django.http import JsonResponse
+
 def get_options(request, item_id):
     try:
         item = Item.objects.get(id=item_id)
