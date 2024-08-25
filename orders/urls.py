@@ -1,7 +1,7 @@
 # urls.py
 
 from django.urls import path
-from .views import CustomLoginView, signup, account, order_history, home_view
+from .views import CustomLoginView, signup, account, order_history, home_view, order_complete
 from django.contrib.auth.views import LogoutView
 from django.contrib.auth import views as auth_views
 from . import views
@@ -13,6 +13,7 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(next_page='home'), name='logout'),  # Logout URL
     path('account/', account, name='account'),
     path('order-history/', order_history, name='order_history'),
+    path('order-complete/', order_complete, name='order_complete'),
     
     
     path('password_reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
