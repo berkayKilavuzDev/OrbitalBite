@@ -1,4 +1,51 @@
 document.addEventListener('DOMContentLoaded', function() {
+    const postcodeInput = document.getElementById('postcode');
+    const suggestionsBox = document.getElementById('suggestions');
+
+    postcodeInput.addEventListener('input', function() {
+        const query = this.value.trim();
+
+        if (query.length >= 2) {  // Start suggesting after 2 characters
+            fetch(`/postcode-suggestions/?postcode=${query}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                suggestionsBox.innerHTML = '';  // Clear the dropdown
+
+                if (data.length) {
+                    data.forEach(item => {
+                        let option = document.createElement('div');
+                        option.className = 'suggestion-item';
+                        option.innerHTML = `
+                            <strong>${item.postcode}</strong> - ${item.admin_district}, ${item.region}, ${item.country}
+                        `;
+                        option.onclick = () => {
+                            postcodeInput.value = item.postcode;  // Set the input field to the selected postcode
+                            suggestionsBox.innerHTML = '';  // Clear dropdown after selection
+                        };
+                        suggestionsBox.appendChild(option);
+                    });
+                } else {
+                    suggestionsBox.innerHTML = '<div class="suggestion-item">No suggestions found</div>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        } else {
+            suggestionsBox.innerHTML = '';  // Clear suggestions if input is too short
+        }
+    });
+    
+
+
+
+
+
     // Function to add event listeners for increment, decrement buttons, and delete buttons in the basket
     function addBasketEventListeners() {
         document.querySelectorAll('.increment-btn-basket').forEach(button => {

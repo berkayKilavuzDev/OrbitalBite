@@ -26,4 +26,7 @@ urlpatterns = [
     path('update-basket/', views.update_basket, name='update_basket'),
     path('delete-from-basket/', views.delete_from_basket, name='delete_from_basket'),
     path('get-options/<int:item_id>/', views.get_options, name='get_options'),
+    
+    path('postcode-suggestions/', views.postcode_suggestions, name='postcode_suggestions'),  # Correct URL pattern
+
 ]

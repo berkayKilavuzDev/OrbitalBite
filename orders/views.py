@@ -20,6 +20,47 @@ from django.template.loader import render_to_string
 
 from django.db.models import Sum
 
+import requests
+from django.http import JsonResponse
+
+import requests
+from django.http import JsonResponse
+
+def postcode_suggestions(request):
+    if request.method == "GET":
+        query = request.GET.get('postcode', '').strip()
+        
+        if not query:
+            return JsonResponse({'error': 'Postcode is required'}, status=400)
+        
+        # Use Postcodes.io to get detailed postcode information
+        api_url = f"http://api.postcodes.io/postcodes?q={query}"
+        try:
+            response = requests.get(api_url)
+            data = response.json()
+
+            if response.status_code == 200 and data['status'] == 200:
+                suggestions = []
+                for result in data['result']:
+                    suggestions.append({
+                        'postcode': result['postcode'],
+                        'admin_district': result['admin_district'],
+                        'region': result['region'],
+                        'country': result['country']
+                    })
+
+                return JsonResponse(suggestions, safe=False)
+            else:
+                return JsonResponse({'error': 'No suggestions found'}, status=404)
+        except requests.exceptions.RequestException as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+
+
+
+
 @csrf_exempt
 def delete_from_basket(request):
     if request.method == 'POST':

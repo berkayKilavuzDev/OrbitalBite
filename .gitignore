@@ -1,15 +1,15 @@
 /workArea.ipynb
-
-OrbitalBite/__pycache__
-OrbitalBite/__init__.py
-/orders/__pycache__
-
-
-/orders/__init__.py
-/orders/emailfolder
-
-/req.txt
+/db.sqlite3
+/env
 
 Project Spesific
-/db.sqlite3
+OrbitalBite/__pycache__
+OrbitalBite/__init__.py
+
+/orders/__pycache__
 /orders/migrations
+
+/orders/emailfolder
+
+
+
