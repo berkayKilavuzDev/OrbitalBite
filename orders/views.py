@@ -8,7 +8,8 @@ from django.contrib.auth import login
 from .forms import CustomUserCreationForm
 
 from django.contrib.auth.decorators import login_required
-from .models import Category, Item, Basket, Option, OptionDetail
+from menu.models import Category, Item, OptionDetail
+from orders.models import Basket
 
 from django.http import JsonResponse
 
@@ -19,46 +20,6 @@ from decimal import Decimal
 from django.template.loader import render_to_string
 
 from django.db.models import Sum
-
-import requests
-from django.http import JsonResponse
-
-import requests
-from django.http import JsonResponse
-
-def postcode_suggestions(request):
-    if request.method == "GET":
-        query = request.GET.get('postcode', '').strip()
-        
-        if not query:
-            return JsonResponse({'error': 'Postcode is required'}, status=400)
-        
-        # Use Postcodes.io to get detailed postcode information
-        api_url = f"http://api.postcodes.io/postcodes?q={query}"
-        try:
-            response = requests.get(api_url)
-            data = response.json()
-
-            if response.status_code == 200 and data['status'] == 200:
-                suggestions = []
-                for result in data['result']:
-                    suggestions.append({
-                        'postcode': result['postcode'],
-                        'admin_district': result['admin_district'],
-                        'region': result['region'],
-                        'country': result['country']
-                    })
-
-                return JsonResponse(suggestions, safe=False)
-            else:
-                return JsonResponse({'error': 'No suggestions found'}, status=404)
-        except requests.exceptions.RequestException as e:
-            return JsonResponse({'error': str(e)}, status=500)
-
-    return JsonResponse({'error': 'Invalid request method'}, status=400)
-
-
-
 
 
 @csrf_exempt
@@ -186,7 +147,7 @@ def add_to_basket(request):
                 # Calculate the total price for the basket item
                 item.total_price = item_price * item.quantity
 
-            basket_html = render_to_string('basket_items.html', {'basket_items': basket_items})
+            basket_html = render_to_string('orders/basket_items.html', {'basket_items': basket_items})
 
             # Calculate checkout price
             checkout_price = sum(item.total_price for item in basket_items)
@@ -260,86 +221,9 @@ def update_basket(request):
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request!'}, status=400)
 
-def signup(request):
-    if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('home')
-    else:
-        form = CustomUserCreationForm()
-    return render(request, 'signup.html', {'form': form})
 
-def home_view(request):
-    # Retrieve all categories
-    categories = Category.objects.all()
-    
-    # Retrieve all options
-    options = Option.objects.all()
 
-    # Create a dictionary to hold category-item mapping
-    category_items = {}
-    for category in categories:
-        # Retrieve items for each category
-        items = Item.objects.filter(category=category)
-        category_items[category] = items
 
-    # Initialize basket_items
-    basket_items = []
-    # Get basket items for the logged-in user
-    if request.user.is_authenticated:
-        basket_items = Basket.objects.filter(user=request.user)
-    
-        for item in basket_items:
-            # Base item price
-            item_price = item.item.price
-            
-            # Check if the item has selected options
-            if item.option.exists():
-                # Get all related OptionDetails
-                option_details = item.option.all()
-                
-                for option in option_details:
-                    # Check if the OptionDetail has a price
-                    if option.price:
-                        # If the OptionDetail has a parent_menuItem, add the option price to the item price
-                        if option.parent_menuItem:
-                            item_price += option.price
-                        else:
-                            # Replace item price with the option price if there's no parent_menuItem
-                            item_price = option.price
-            
-            # Calculate the total price for the basket item
-            item.total_price = item_price * item.quantity
-    
-    checkout_price= sum(item.total_price for item in basket_items)
-    checkout_price = round(Decimal(checkout_price), 2) if checkout_price else Decimal('0.00')
-
-    # Pass the categories, category-item mapping, and basket items to the template context
-    context = {
-        'categories': categories,
-        'category_items': category_items,
-        'basket_items': basket_items if request.user.is_authenticated else None,
-        'options': options,
-        'checkout_price': checkout_price
-    }
-
-    return render(request, 'home.html', context)
-
-class CustomLoginView(LoginView):
-    template_name = 'login.html'  # Specify the template name
-    success_url = reverse_lazy('home')  # Redirect URL after successful login
-
-@login_required
-def account(request):
-    # Logic to fetch user's account information
-    user = request.user
-    context = {
-        'user': user,
-        # Add other context variables as needed
-    }
-    return render(request, 'account.html', context)
 
 @login_required
 def order_history(request):
@@ -364,30 +248,3 @@ def order_complete(request):
     return render(request, 'order_complete.html', context)
 
 from django.http import JsonResponse
-
-def get_options(request, item_id):
-    try:
-        item = Item.objects.get(id=item_id)
-        options = item.option_set.all()  # Assuming Option model has a ForeignKey to Item
-        
-        options_data = []
-        
-        for option in options:
-            option_details = option.optiondetail_set.all()  # Get all OptionDetails associated with this option
-            option_details_data = [{'id': detail.id, 'optionDetail_name': detail.optionDetail_name, 'price': detail.price} for detail in option_details]
-            
-            options_data.append({
-                'id': option.id,
-                'option_name': option.option_name,
-                'details': option_details_data
-            })
-            
-        #options_data = [{'id': option.id, 'option_name': option.option_name, 'price': option.price} for option in options]
-        print(options_data)
-        
-        return JsonResponse({
-            'status': 'success',
-            'options': options_data
-        })
-    except Item.DoesNotExist:
-        return JsonResponse({'status': 'error', 'message': 'Item not found!'}, status=404)

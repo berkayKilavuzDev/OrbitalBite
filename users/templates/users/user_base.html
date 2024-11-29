@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Google tag (gtag.js) -->
+    <!-- ! ADD GOOGLE STATICS TAG HERE -->
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}User Page{% endblock %}</title>
+    <meta name="description" content="User page for accessing forms and user-specific features.">
+    <meta name="keywords" content="user page, user form, interview preparation, account access">
+    <meta name="author" content="Interviewboost Team">
+    <link rel="icon" href="{% static 'images/icon.png' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'css/user-style.css' %}">
+</head>
+
+<body class="min-vh-100 px-3">
+    <!-- Header Section -->
+    <header class="top-container py-md-4 py-4 d-flex justify-content-center align-items-center col-md-6 col-sm-8 col-12" style="max-width: 450px;">
+        <div class="logo">
+            <a href="#"> <!-- ! add home url -->
+                <img class=" w-75 w-md-25" src="{% static '/images/logo.png' %}" alt="{{ SITE_NAME }} Logo">
+            </a>
+        </div>
+    </header>    
+
+    <!-- Form Section -->
+    <main class="py-5 px-md-5 px-4 bg-white rounded-4 col-md-6 col-sm-8 col-12 mb-5" style="max-width: 450px;">
+        <h1 class="text-center display-6">{% block header %}User Form{% endblock %}</h1>
+        {% block form %}
+        <!-- Form will be injected here -->
+        {% endblock %}
+        <div class="text-center mt-2">
+            {% block links %}
+            <!-- Links or buttons can be injected here -->
+            {% endblock %}
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous" async></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" async></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js" async></script>
+</body>
+
+</html>

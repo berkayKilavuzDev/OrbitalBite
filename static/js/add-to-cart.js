@@ -1,3 +1,5 @@
+
+/*
 document.addEventListener('DOMContentLoaded', function() {
     const postcodeInput = document.getElementById('postcode');
     const suggestionsBox = document.getElementById('suggestions');
@@ -40,10 +42,6 @@ document.addEventListener('DOMContentLoaded', function() {
             suggestionsBox.innerHTML = '';  // Clear suggestions if input is too short
         }
     });
-    
-
-
-
 
 
     // Function to add event listeners for increment, decrement buttons, and delete buttons in the basket
@@ -327,3 +325,4 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => console.error('Error:', error));
     }
 });
+*/

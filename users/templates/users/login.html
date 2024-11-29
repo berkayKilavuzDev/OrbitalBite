@@ -1,0 +1,55 @@
+{% extends 'users/user_base.html' %}
+
+{% block title %}Interviewboost Login{% endblock %}
+{% block header %}Login{% endblock %}
+
+{% block form %}
+    <form method="post" class="py-2">
+        {% csrf_token %}
+        
+        <!-- Non-field errors (e.g., incorrect credentials) -->
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <!-- Username Field -->
+        <div class="form-group py-1">
+            <label for="username">Username:</label>
+            <input type="text" name="username" id="username" class="form-control" required>
+            {% if form.username.errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.username.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Password Field -->
+        <div class="form-group py-1">
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" class="form-control" required>
+            {% if form.password.errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.password.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Submit Button -->
+        <div class="d-flex justify-content-center align-items-center">
+            <button type="submit" class="btn btn-primary col-md-6 col-9 mt-3">Log In</button>
+        </div>        
+    </form>
+{% endblock %}
+
+{% block links %}
+    <a href="{% url 'users:password_reset' %}" class="btn btn-link">Forgot your password?</a>
+    <a href="{% url 'users:signup' %}" class="btn btn-link">Don't have an account?</a>
+{% endblock %}
