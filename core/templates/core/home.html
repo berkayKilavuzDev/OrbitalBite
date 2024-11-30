@@ -8,7 +8,7 @@
     <div class="container-fluid">
         <div class="row">
             <!-- Categories -->            
-            <section class="col-md-3 mt-4 d-lg-block d-none order-1">
+            <section class="col-md-2 mt-4 d-lg-block d-none order-1">
                 {% for category in categories %}
                 <div class="list-group" id="categories">
                     <a href="#{{ category.name }}" class="list-group-item list-group-item-action">{{ category.name }}</a>
@@ -31,7 +31,7 @@
                         data-item-description="{{ item.description }}">
                         <div class="card-body">
                             <div class="fs-5 fw-bold">{{ item.name }}</div>
-                            <p class="">{{ item.description }}</p>
+                            <p class="m-0">{{ item.description }}</p>
                             <p class="fw-bold menu-item-price">£ {{ item.price }}</p>
                             <img src="{{ item.photo.url }}" alt="{{ item.name }} Image" class="img-fluid rounded d-none">
                         </div>                        
@@ -59,7 +59,8 @@
                                                         id="option-{{ detail.id }}" 
                                                         name="option-{{ option.id }}" 
                                                         class="form-check-input" 
-                                                        value="{{ detail.id }}">
+                                                        value="{{ detail.id }}" 
+                                                        data-price="{{ detail.price|default_if_none:0 }}">
                                                     <label for="option-{{ detail.id }}" class="form-check-label">
                                                         {{ detail.optionDetail_name }}
                                                         {% if detail.price > 0 %}
@@ -92,9 +93,9 @@
                                             <div class="col-7 col-md-8 d-flex justify-content-end">
                                                 <button type="button" class="btn btn-primary d-flex align-items-center justify-content-between w-100" id="save-options-btn">
                                                     <div class="d-flex align-items-center">
-                                                        Add<span class="d-none d-sm-inline">&nbsp;1 to cart</span>
+                                                        Add<span class="d-none d-sm-inline">&nbsp;<span class="dynamic-quantity" id="dynamic-quantity-{{ item.id }}">1</span> to cart</span>
                                                     </div>
-                                                    <div class="badge align-middle text-bg-light ms-3 d-flex align-items-center">£15.99</div>
+                                                    <div class="badge align-middle text-bg-light ms-3 d-flex align-items-center" id="dynamic-price-{{ item.id }}"></div>
                                                 </button>
                                             </div>                                
                                         </div>     
@@ -113,10 +114,10 @@
                 <section class="row">
                     <div class="btn-group w-100 py-2" role="group" aria-label="Basic radio toggle button group">
                         <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" checked>
-                        <label class="btn btn-outline-success flex-fill py-3 fs-6" for="btnradio2">Delivery</label>
+                        <label class="btn btn-outline-secondary flex-fill py-3 fs-6" for="btnradio2">Delivery</label>
 
                         <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
-                        <label class="btn btn-outline-success flex-fill py-3 fs-6" for="btnradio3">Pick-up</label>
+                        <label class="btn btn-outline-secondary flex-fill py-3 fs-6" for="btnradio3">Pick-up</label>
                     </div>
                     <!-- If delivery selected -->    
                     <div id="addressField" class="form-floating d-none">
@@ -198,6 +199,6 @@
 
 {% block scripts %}
     <script src="{% static 'js/quantity-controls.js' %}"></script>
-    <script src="{% static 'js/add-to-cart.js' %}"></script>
+    <script src="{% static 'js/item-modal.js' %}"></script>
     <script src="{% static 'js/delivery-pickup.js' %}"></script>
 {% endblock %}

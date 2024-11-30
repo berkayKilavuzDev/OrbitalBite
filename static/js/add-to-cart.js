@@ -1,5 +1,5 @@
 
-/*
+
 document.addEventListener('DOMContentLoaded', function() {
     const postcodeInput = document.getElementById('postcode');
     const suggestionsBox = document.getElementById('suggestions');
@@ -186,16 +186,18 @@ document.addEventListener('DOMContentLoaded', function() {
             let currentValue = parseInt(quantityInput.value);
             if (currentValue > 1) {
                 quantityInput.value = currentValue - 1;
+                document.getElementById(`dynamic-quantity-${itemId}`).textContent = quantityInput.value; // Update dynamic quantity
             }
         });
     });
-
+    
     document.querySelectorAll('.increment-btn').forEach(button => {
         button.addEventListener('click', function() {
             const itemId = this.getAttribute('data-item-id');
             const quantityInput = document.getElementById(`quantity-input-${itemId}`);
             let currentValue = parseInt(quantityInput.value);
             quantityInput.value = currentValue + 1;
+            document.getElementById(`dynamic-quantity-${itemId}`).textContent = quantityInput.value; // Update dynamic quantity
         });
     });
 
@@ -325,4 +327,3 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => console.error('Error:', error));
     }
 });
-*/

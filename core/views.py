@@ -15,26 +15,37 @@ def item_details_api(request, item_id):
 
     # Build the response data
     data = {
+        'id': item.id,
         'name': item.name,
-        'description': item.description,
-        'price': float(item.price),
-        'options': [
-            {
+        'description': item.description or '',
+        'price': float(item.price),  # Ensure price is serialized as a float
+        'isAvailable': item.isAvailable,
+        'photo_url': item.photo.url if item.photo else None,  # Provide photo URL if available
+        'options': []
+    }
+
+    # If the item has options, include them
+    if item.hasOption:
+        options = item.option_set.all()  # Fetch all options for this item
+        for option in options:
+            option_data = {
                 'id': option.id,
                 'name': option.option_name,
                 'type': option.option_type,
-                'details': [
-                    {
-                        'id': detail.id,
-                        'name': detail.optionDetail_name,
-                        'price': float(detail.price or 0),
-                    }
-                    for detail in option.optiondetail_set.all()
-                ],
+                'details': []
             }
-            for option in item.option_set.all()
-        ]
-    }
+
+            # Add details for each option
+            option_details = option.optiondetail_set.all()
+            for detail in option_details:
+                detail_data = {
+                    'id': detail.id,
+                    'name': detail.optionDetail_name,
+                    'price': float(detail.price or 0),  # Ensure price is serialized as a float
+                }
+                option_data['details'].append(detail_data)
+
+            data['options'].append(option_data)
 
     # Return the data as JSON
     return JsonResponse(data)
