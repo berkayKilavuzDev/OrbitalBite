@@ -32,7 +32,7 @@
                         <div class="card-body">
                             <div class="fs-5 fw-bold">{{ item.name }}</div>
                             <p class="m-0">{{ item.description }}</p>
-                            <p class="fw-bold menu-item-price">£ {{ item.price }}</p>
+                            <p class="fw-bold menu-item-price m-0 mt-2">£ {{ item.price }}</p>
                             <img src="{{ item.photo.url }}" alt="{{ item.name }} Image" class="img-fluid rounded d-none">
                         </div>                        
                     </div>
@@ -54,8 +54,9 @@
                                             <div class="form-group mt-3">
                                                 <div class="form-label fw-bold fs-6">{{ option.option_name }}</div>
                                                 {% for detail in option.optiondetail_set.all %}
+                                                {% csrf_token %}
                                                 <div class="form-check">
-                                                    <input type="radio" 
+                                                    <input type="{{ option.option_type }}" 
                                                         id="option-{{ detail.id }}" 
                                                         name="option-{{ option.id }}" 
                                                         class="form-check-input" 
@@ -69,6 +70,10 @@
                                                     </label>
                                                 </div>
                                                 {% endfor %}
+                                                <!-- Warning message placeholder -->
+                                                <div class="warning-message text-danger mt-1" id="warning-{{ option.id }}" style="display: none;">
+                                                    Please select an option
+                                                </div>
                                             </div>
                                             {% endfor %}
                                         {% else %}
@@ -83,7 +88,7 @@
                                                     <button type="button" class="input-group-text btn btn-outline-secondary btn decrement-btn" data-item-id="{{ item.id }}">
                                                         <i class="bi bi-dash"></i>
                                                     </button>
-                                                    <input type="number" name="quantity" class="form-control form-control text-center quantity-input" value="1" id="quantity-input-{{ item.id }}" min="1">
+                                                    <input type="number" name="quantity" class="form-control form-control text-center quantity-input" value="1" id="quantity-input-{{ item.id }}" min="1" disabled>
                                                     <button type="button" class="input-group-text btn btn-outline-secondary btn increment-btn" data-item-id="{{ item.id }}">
                                                         <i class="bi bi-plus"></i>
                                                     </button>
@@ -91,7 +96,7 @@
                                             </div>
                                             <!-- Add to Cart Button on the Right -->
                                             <div class="col-7 col-md-8 d-flex justify-content-end">
-                                                <button type="button" class="btn btn-primary d-flex align-items-center justify-content-between w-100" id="save-options-btn">
+                                                <button type="button" class="btn btn-primary d-flex align-items-center justify-content-between w-100" id="add-to-cart-btn" data-item-id="{{ item.id }}">
                                                     <div class="d-flex align-items-center">
                                                         Add<span class="d-none d-sm-inline">&nbsp;<span class="dynamic-quantity" id="dynamic-quantity-{{ item.id }}">1</span> to cart</span>
                                                     </div>
@@ -182,13 +187,51 @@
                 <section class="d-none d-sm-block mt-3">
                     <div class="fs-3">Basket</div>
                     <div class="card">
-                        <ul class="list-group list-group-flush" id="basket-items">
-                            <!-- ! Copy from old home -->
+                        <ul class="list-group list-group-flush" id="basket-container">
+                            {% for basket_item in basket_items %}
+                            <li class="list-group-item">
+                                <div class="row">
+                                    <div class="col-10">
+                                        <span>{{ basket_item.item.name }}</span>
+                                    </div>
+                                    <div class="col-2 text-right">
+                                        <!-- !Put a better cancel sign or trash box -->
+                                        <button type="button" class="btn-close" aria-label="Close" data-item-id="{{ basket_item.id }}"></button>
+                                    </div>
+                                </div>                                
+                                {% if basket_item.option.all %}
+                                    {% for option in basket_item.option.all %}
+                                        <div class="row">
+                                            <div class="col-12 option-name text-muted">
+                                                {{ option.optionDetail_name }}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                                <div class="row mt-3">
+                                    <!-- Second Row: Quantity controls and Price -->
+                                    <div class="col-4 col-md-6">
+                                        <div class="input-group input-group-sm">
+                                            <button type="button" class="input-group-text btn btn-outline-secondary btn decrement-btn" data-item-id="{{ item.id }}">
+                                                <i class="bi bi-dash"></i>
+                                            </button>
+                                            <input type="number" name="quantity" style="max-width: 35px;" class="m-0 p-0 form-control form-control-sm text-center quantity-input" value="1" id="quantity-input-{{ item.id }}" min="1">
+                                            <button type="button" class="input-group-text btn btn-outline-secondary btn increment-btn" data-item-id="{{ item.id }}">
+                                                <i class="bi bi-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 d-flex justify-content-end align-items-center">
+                                        <p class="">£ {{ basket_item.total_price|floatformat:2 }}</p>
+                                    </div>
+                                </div>
+                            </li>
+                            {% endfor %}
                         </ul>
 
-                        <div class="card-footer d-flex justify-content-between align-items-center">
+                        <div class="card-footer d-flex justify-content-center align-items-center">
                             <!-- ! Copy from old home -->
-                            <h5 class="card-title mt-2 ml-1">Total: <br>£ {{ checkout_price }}</h5>
+                            <button class="btn btn-success px-5">Checkout</button>
                         </div>
                     </div>
                 </section>
@@ -199,6 +242,7 @@
 
 {% block scripts %}
     <script src="{% static 'js/quantity-controls.js' %}"></script>
+    
     <script src="{% static 'js/item-modal.js' %}"></script>
     <script src="{% static 'js/delivery-pickup.js' %}"></script>
 {% endblock %}

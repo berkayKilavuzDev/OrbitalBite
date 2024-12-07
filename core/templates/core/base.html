@@ -13,7 +13,7 @@
         <div class="container-fluid">
             <div class="row align-items-center justify-content-between">
                 <!-- Logo -->
-                <div class="col-3">
+                <div class="col-6 col-md-3">
                     <a href="{% url 'core:home' %}">
                         <!-- TODO: Add maximum image height -->
                         <!-- TODO: Change with static location: static '/images/logo.png'-->
@@ -36,11 +36,9 @@
                     </div>
                 </div>
                 {% else %}
-                <div class="col-3 d-flex align-items-center justify-content-end">
-                    <div class="justify-content-center">
+                <div class="col-6 col-md-3 d-flex flex-wrap justify-content-end align-items-end">
                         <a href="#" class="m-1 btn btn-primary">Log In</a>
                         <a href="#" class="m-1 btn btn-primary">Sign Up</a>
-                    </div>
                 </div>
                 {% endif %}
             </div>

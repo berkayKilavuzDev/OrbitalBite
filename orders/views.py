@@ -77,8 +77,91 @@ def delete_from_basket(request):
     return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
 
 
+
+import json
 @csrf_exempt
 def add_to_basket(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            item_id = data.get('item_id')
+            quantity = int(data.get('quantity', 1))
+            option_ids = data.get('options', [])  # List of selected option IDs
+
+            # Fetch the item and user
+            item = Item.objects.get(pk=item_id)
+            user = request.user
+
+            # Fetch selected options
+            option_details = OptionDetail.objects.filter(id__in=option_ids) if option_ids else []
+
+            # Check for existing basket items with the same item and options
+            existing_basket_items = Basket.objects.filter(user=user, item=item)
+
+            # Flag for matching basket item
+            exact_match_found = False
+
+            for basket_item in existing_basket_items:
+                # Check if options match
+                basket_item_options = basket_item.option.all()
+                if set(basket_item_options) == set(option_details):
+                    # Exact match found, update quantity
+                    basket_item.quantity += quantity
+                    basket_item.save()
+                    exact_match_found = True
+                    break
+
+            if not exact_match_found:
+                # No exact match found, create a new basket item
+                new_basket_item = Basket(user=user, item=item, quantity=quantity)
+                new_basket_item.save()
+                new_basket_item.option.set(option_details)  # Link options
+                new_basket_item.save()
+
+            # Calculate updated basket data
+            basket_items = Basket.objects.filter(user=user)
+            basket_data = []
+            checkout_price = Decimal(0.00)
+
+            for basket_item in basket_items:
+                # Calculate total price for each item
+                item_price = basket_item.item.price
+                option_price = basket_item.option.aggregate(total=Sum('price'))['total'] or Decimal(0.00)
+                total_price = (item_price + option_price) * basket_item.quantity
+                checkout_price += total_price
+
+                # Add item details to response data
+                basket_data.append({
+                    'id': basket_item.id,
+                    'item_name': basket_item.item.name,
+                    'quantity': basket_item.quantity,
+                    'options': [opt.optionDetail_name for opt in basket_item.option.all()],
+                    'total_price': float(total_price),
+                })
+
+            # Return updated basket details
+            return JsonResponse({
+                'status': 'success',
+                'basket': basket_data,
+                'checkout_price': float(checkout_price),
+            })
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    return JsonResponse({'status': 'error', 'message': 'Invalid request!'}, status=400)
+
+
+
+
+
+
+
+
+
+
+
+
+@csrf_exempt
+def add_to_basket2(request):
     if request.method == 'POST':
         item_id = request.POST.get('item_id')
         quantity = int(request.POST.get('quantity', 1))

@@ -22,7 +22,7 @@ urlpatterns = [
     #path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='registration/custom_reset_confirm.html'), name='password_reset_confirm'),
     #path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='registration/custom_reset_complete.html'), name='password_reset_complete'),
     
-    
+    #path('cart/add/', views.cart_add, name='cart-add'),
     path('add-to-basket/', views.add_to_basket, name='add_to_basket'),
     path('update-basket/', views.update_basket, name='update_basket'),
     path('delete-from-basket/', views.delete_from_basket, name='delete_from_basket'),

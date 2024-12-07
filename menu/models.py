@@ -28,13 +28,13 @@ class Item(models.Model):
 
 
 class OptionType(models.TextChoices):
-    CHECKBOX = 'Checkbox', 'Checkbox'
-    RADIO = 'Radio', 'Radio'
+    CHECKBOX = 'checkbox', 'checkbox'
+    RADIO = 'radio', 'radio'
 
 class Option(models.Model):
     parent_menu_item = models.ForeignKey(Item, on_delete=models.CASCADE)
     option_name = models.CharField(max_length=255)
-    option_type = models.CharField(max_length=20, choices=OptionType.choices,  null=True)
+    option_type = models.CharField(max_length=20, choices=OptionType.choices)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
