@@ -10,7 +10,7 @@ class Basket(models.Model):
     quantity = models.PositiveIntegerField(default=1)
     option_details = models.ManyToManyField(OptionDetail, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
+    updated_at = models.DateTimeField(auto_now=True)
     def total_price(self):
         base_price = self.item.price
         options_price = sum(option.price for option in self.option_details.all())
@@ -24,7 +24,7 @@ class Order(models.Model):
         ('pending', 'Pending'),  # Müşteri siparişi verdi, henüz onaylanmadı
         ('approved', 'Approved'),  # Restoran siparişi onayladı
         ('preparing', 'Preparing'),  # Hazırlanıyor
-        ('completed', 'Completed'),  # Sipariş tamamlandı
+        ('delivered', 'Delivered'),  # Sipariş tamamlandı
         ('cancelled', 'Cancelled')  # Sipariş iptal edildi
     ]
 
@@ -32,13 +32,8 @@ class Order(models.Model):
     order_date = models.DateTimeField(auto_now_add=True)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     order_status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    approved_by = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="approved_orders"
-    )  # Siparişi onaylayan restoran çalışanı
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"Order {self.id} - {self.user.username} - {self.order_status}"
@@ -46,7 +41,7 @@ class Order(models.Model):
 class OrderDetails(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="order_details")
     menu_item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
-    option_details = models.ManyToManyField(OptionDetail, blank=True)
+    menu_item_option = models.ManyToManyField(OptionDetail, blank=True)
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
