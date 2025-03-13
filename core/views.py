@@ -1,32 +1,31 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from decimal import Decimal
 from orders.models import Basket
-from menu.models import Category, Item, Option, OptionDetail
+from menu.models import MenuCategory, MenuItem, Option, OptionDetail
 from django.http import JsonResponse
+from django.conf import settings
 import requests
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
 
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-
+# ✅ Ürün detaylarını API olarak döndürür
 def item_details_api(request, item_id):
-    # Fetch the requested item or return 404 if not found
-    item = get_object_or_404(Item, id=item_id)
+    item = get_object_or_404(MenuItem, id=item_id)
 
-    # Build the response data
     data = {
         'id': item.id,
         'name': item.name,
         'description': item.description or '',
-        'price': float(item.price),  # Ensure price is serialized as a float
-        'isAvailable': item.isAvailable,
-        'photo_url': item.photo.url if item.photo else None,  # Provide photo URL if available
+        'price': float(item.price),  
+        'is_available': item.is_available,  # Güncellendi
+        'photo_url': item.photo.url if item.photo else None,
         'options': []
     }
 
-    # If the item has options, include them
-    if item.hasOption:
-        options = item.option_set.all()  # Fetch all options for this item
+    # Eğer ürün opsiyon içeriyorsa
+    if item.has_option:  # Güncellendi
+        options = item.option_set.all()
         for option in options:
             option_data = {
                 'id': option.id,
@@ -34,65 +33,57 @@ def item_details_api(request, item_id):
                 'type': option.option_type,
                 'details': []
             }
-
-            # Add details for each option
             option_details = option.optiondetail_set.all()
             for detail in option_details:
-                detail_data = {
+                option_data['details'].append({
                     'id': detail.id,
-                    'name': detail.optionDetail_name,
-                    'price': float(detail.price or 0),  # Ensure price is serialized as a float
-                }
-                option_data['details'].append(detail_data)
-
+                    'name': detail.option_name,  # Güncellendi
+                    'price': float(detail.price or 0),
+                })
             data['options'].append(option_data)
 
-    # Return the data as JSON
     return JsonResponse(data)
 
 
+# ✅ Ana sayfa görünümü (Menü ve Sepet)
 def home_view(request):
-    # Retrieve all categories and items
-    categories = Category.objects.all()
+    categories = MenuCategory.objects.all()
     category_items = {
-        category: Item.objects.filter(category=category) for category in categories
+        category: MenuItem.objects.filter(category=category) for category in categories
     }
 
-    # Basket items logic
+    # Sepet bilgilerini çek
     basket_items = []
     checkout_price = Decimal('0.00')
+
     if request.user.is_authenticated:
         basket_items = Basket.objects.filter(user=request.user)
         for item in basket_items:
             item_price = item.item.price
 
-            # Check if the basket item has selected options
-            if item.option.exists():
-                option_details = item.option.all()
-                for option in option_details:
-                    # Add option price to the item's base price if applicable
+            # Seçili opsiyonları kontrol et
+            if item.option_details.exists():  # Güncellendi
+                for option in item.option_details.all():
                     if option.price:
                         item_price += option.price
             
-            # Calculate total price for the basket item
             item.total_price = item_price * item.quantity
-        
-        # Calculate the checkout total price
+
+        # Sepet toplam fiyatı
         checkout_price = sum(item.total_price for item in basket_items)
         checkout_price = round(Decimal(checkout_price), 2)
 
-    # Pass the categories, items, basket items, and options to the template context
     context = {
-        'categories': categories,                          # Categories for the sidebar
-        'category_items': category_items,                  # Mapping of categories to their items
-        'basket_items': basket_items,                      # User's basket items
-        'checkout_price': checkout_price,                  # Total checkout price
+        'categories': categories,
+        'category_items': category_items,
+        'basket_items': basket_items,
+        'checkout_price': checkout_price,
     }
 
     return render(request, 'core/home.html', context)
 
 
-
+# ✅ Postcode API Entegrasyonu
 def postcode_suggestions(request):
     if request.method == "GET":
         query = request.GET.get('postcode', '').strip()
@@ -100,26 +91,38 @@ def postcode_suggestions(request):
         if not query:
             return JsonResponse({'error': 'Postcode is required'}, status=400)
         
-        # Use Postcodes.io to get detailed postcode information
         api_url = f"http://api.postcodes.io/postcodes?q={query}"
         try:
             response = requests.get(api_url)
             data = response.json()
 
-            if response.status_code == 200 and data['status'] == 200:
-                suggestions = []
-                for result in data['result']:
-                    suggestions.append({
+            if response.status_code == 200 and data.get('status') == 200:
+                suggestions = [
+                    {
                         'postcode': result['postcode'],
-                        'admin_district': result['admin_district'],
-                        'region': result['region'],
-                        'country': result['country']
-                    })
+                        'admin_district': result.get('admin_district', ''),
+                        'region': result.get('region', ''),
+                        'country': result.get('country', '')
+                    }
+                    for result in data.get('result', [])
+                ]
 
-                return JsonResponse(suggestions, safe=False)
+                return JsonResponse({'status': 'success', 'suggestions': suggestions})
             else:
-                return JsonResponse({'error': 'No suggestions found'}, status=404)
+                return JsonResponse({'status': 'error', 'message': 'No suggestions found'}, status=404)
         except requests.exceptions.RequestException as e:
-            return JsonResponse({'error': str(e)}, status=500)
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
-    return JsonResponse({'error': 'Invalid request method'}, status=400)
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=400)
+
+
+def site_info(request):
+    """
+    Site bilgilerini JSON formatında döndürür.
+    React frontend bu API’den bilgileri alabilir.
+    """
+    return JsonResponse({
+        "site_name": settings.SITE_NAME,
+        "site_url": settings.SITE_URL,
+        "support_email": settings.SUPPORT_EMAIL
+    })
