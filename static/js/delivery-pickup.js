@@ -1,54 +1,55 @@
-function populateDateOptions(selectElement) {
-    // Clear any existing options
-    selectElement.innerHTML = '';
+document.addEventListener("DOMContentLoaded", function () {
+    function populateDateOptions(selectElement) {
+        if (!selectElement) return;
 
-    // Get today's date
-    const today = new Date();
+        selectElement.innerHTML = ""; // Eski seçenekleri temizle
 
-    // Format the date as DD.MM
-    const formatDate = (date) => {
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        return `${day}.${month}`;
-    };
+        const today = new Date();
+        const formatDate = (date) => {
+            const day = String(date.getDate()).padStart(2, "0");
+            const month = String(date.getMonth() + 1).padStart(2, "0");
+            return `${day}.${month}`;
+        };
 
-    // Create options dynamically
-    const todayOption = document.createElement("option");
-    todayOption.text = `${formatDate(today)} - Today`;
-    todayOption.selected = true;
+        const todayOption = document.createElement("option");
+        todayOption.text = `${formatDate(today)} - Today`;
+        todayOption.selected = true;
 
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
-    const tomorrowOption = document.createElement("option");
-    tomorrowOption.text = `${formatDate(tomorrow)} - Tomorrow`;
-    tomorrowOption.value = "1";
+        const tomorrow = new Date(today);
+        tomorrow.setDate(today.getDate() + 1);
+        const tomorrowOption = document.createElement("option");
+        tomorrowOption.text = `${formatDate(tomorrow)} - Tomorrow`;
+        tomorrowOption.value = "1";
 
-    // Append options to the select element
-    selectElement.appendChild(todayOption);
-    selectElement.appendChild(tomorrowOption);
-}
-
-// Function to toggle the visibility for delivery or pick-up
-function toggleAddressField() {
-    var deliveryRadio = document.getElementById('btnradio2');
-    var pickupRadio = document.getElementById('btnradio3');
-    var addressField = document.getElementById('addressField');
-    var pickupField = document.getElementById('pickupField');
-
-    if (deliveryRadio.checked) {
-        addressField.classList.remove('d-none');
-        pickupField.classList.add('d-none');
-        populateDateOptions(document.getElementById('deliveryDateSelect'));
-    } else if (pickupRadio.checked) {
-        addressField.classList.add('d-none');
-        pickupField.classList.remove('d-none');
-        populateDateOptions(document.getElementById('pickupDateSelect'));
+        selectElement.appendChild(todayOption);
+        selectElement.appendChild(tomorrowOption);
     }
-}
 
-// Attach the function to the radio buttons
-document.getElementById('btnradio2').addEventListener('change', toggleAddressField);
-document.getElementById('btnradio3').addEventListener('change', toggleAddressField);
+    function toggleAddressField() {
+        const deliveryRadio = document.getElementById("btnradio2");
+        const pickupRadio = document.getElementById("btnradio3");
+        const addressField = document.getElementById("addressField");
+        const pickupField = document.getElementById("pickupField");
+        const deliverySelect = document.getElementById("deliveryDateSelect");
+        const pickupSelect = document.getElementById("pickupDateSelect");
 
-// Initialize the fields on page load
-toggleAddressField();
+        if (deliveryRadio?.checked) {
+            addressField?.classList.remove("d-none");
+            pickupField?.classList.add("d-none");
+            populateDateOptions(deliverySelect);
+        } else if (pickupRadio?.checked) {
+            addressField?.classList.add("d-none");
+            pickupField?.classList.remove("d-none");
+            populateDateOptions(pickupSelect);
+        }
+    }
+
+    // Eğer elementler varsa event listener ekleyelim
+    const deliveryRadioBtn = document.getElementById("btnradio2");
+    const pickupRadioBtn = document.getElementById("btnradio3");
+
+    if (deliveryRadioBtn) deliveryRadioBtn.addEventListener("change", toggleAddressField);
+    if (pickupRadioBtn) pickupRadioBtn.addEventListener("change", toggleAddressField);
+
+    toggleAddressField(); // Sayfa açıldığında başlangıç durumu ayarla
+});
