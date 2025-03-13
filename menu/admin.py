@@ -1,7 +1,7 @@
 from django.contrib import admin
-from .models import Category, Item, Option, OptionDetail
+from .models import MenuCategory, MenuItem, Option, OptionDetail
 
-admin.site.register(Category)
-admin.site.register(Item)
+admin.site.register(MenuCategory)
+admin.site.register(MenuItem)
 admin.site.register(Option)
 admin.site.register(OptionDetail)

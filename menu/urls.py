@@ -1,16 +1,10 @@
-from django.urls import path, include
-from django.contrib import admin
-from django.views.generic.base import TemplateView
+from django.urls import path
 from . import views
 
-app_name = 'users'
+app_name = 'menu'
 
 urlpatterns = [
-    #path('admin/', admin.site.urls),
-    #path("", TemplateView.as_view(template_name="home.html"), name="home"),
-    
-    #TODO: Uncomment after adding views
-    # path('sitemap.xml', views.sitemap_view, name='sitemap'),  # Sitemap URL
-    # path('privacy/', views.privacy_view, name='privacy')
-    path('get-options/<int:item_id>/', views.get_options, name='get_options'),
+    path("api/menu-items/", views.get_menu, name="get-menu"),  # 🆕 Menü API'si eklendi!
+    path("api/categories/", views.get_categories, name="categories"),  # 🆕 Kategorileri almak için
+    path("api/item-details/<int:item_id>/", views.item_details_api, name="item-details-api"),  
 ]
