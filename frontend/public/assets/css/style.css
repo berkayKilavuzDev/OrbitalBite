@@ -1,0 +1,179 @@
+/* Hide the default number input arrows */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Genel container ayarları */
+.container-fluid {
+    width: 100%;
+    max-width: 1300px; /* Set the maximum width */
+    margin: 0 auto; /* Center the container */
+}
+
+/* ✅ Navbar güncellemesi */
+.navbar {
+    background-color: black;
+    padding: 10px 0;
+}
+
+.navbar a {
+    color: white !important;
+    text-decoration: none;
+    margin: 0 15px;
+    font-weight: bold;
+    transition: color 0.3s ease-in-out;
+}
+
+.navbar a:hover {
+    color: #3895f1 !important;
+}
+
+/* ✅ Sepet stilleri */
+.cart-icon {
+    color: green;
+    font-weight: bold;
+    margin-left: 15px;
+}
+
+.cart-count {
+    font-size: 14px;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+/* ✅ Sepet popup için */
+.cart-popup {
+    position: absolute;
+    top: 50px;
+    right: 20px;
+    background-color: white;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    padding: 15px;
+    border-radius: 5px;
+    display: none;
+}
+
+.cart-popup.active {
+    display: block;
+}
+
+/* ✅ Sepette ürün miktarı butonları */
+.quantity-btn {
+    background-color: #3895f1;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    margin: 0 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.quantity-btn:hover {
+    background-color: #2673c9;
+}
+
+/* ✅ "Edit" butonu için */
+.edit-btn {
+    background-color: #ffcc00;
+    color: black;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+}
+
+.edit-btn:hover {
+    background-color: #e6b800;
+}
+
+/* ✅ Menü kart hover efekti */
+.card.clickable-card {
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card.clickable-card:hover {
+    background-color: #cce5ff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ✅ Öneri kutusu */
+.suggestions-container {
+    border: 1px solid #ccc;
+    background-color: #fff;
+    position: absolute;
+    width: 300px;
+    max-height: 150px;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.suggestion-item {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.suggestion-item:hover {
+    background-color: #f0f0f0;
+}
+
+/* ✅ Menü fiyat rengi */
+.menu-item-price {
+    color: #3895f1;
+}
+
+/* ✅ Popup stilleri */
+.popup-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    border-radius: 10px;
+    display: none;
+    width: 400px;
+    z-index: 1000;
+}
+
+.popup-container.active {
+    display: block;
+}
+
+.popup-header {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.popup-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.popup-btn {
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+}
+
+.popup-btn.confirm {
+    background-color: #3895f1;
+    color: white;
+}
+
+.popup-btn.confirm:hover {
+    background-color: #2673c9;
+}
+
+.popup-btn.cancel {
+    background-color: #ccc;
+}
+
+.popup-btn.cancel:hover {
+    background-color: #aaa;
+}

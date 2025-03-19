@@ -1,0 +1,138 @@
+/* ✅ Sayfanın tamamını kapsayan geniş ekran tasarımı */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f8f8;
+    margin: 0;
+    padding: 0;
+}
+
+/* ✅ Genel container ayarları */
+.container-fluid {
+    width: 100%;
+    max-width: 1300px;
+    margin: 0 auto;
+    display: flex;
+}
+
+/* ✅ Navbar güncellemesi */
+.navbar {
+    background-color: black;
+    padding: 10px 0;
+}
+
+.navbar a {
+    color: white !important;
+    text-decoration: none;
+    margin: 0 15px;
+    font-weight: bold;
+    transition: color 0.3s ease-in-out;
+}
+
+.navbar a:hover {
+    color: #ff6600 !important;
+}
+
+/* ✅ Kategoriler */
+.category-menu {
+    width: 20%;
+    padding: 20px;
+    position: fixed;
+    left: 0;
+    top: 60px;
+    height: 100vh;
+    overflow-y: auto;
+    background-color: white;
+    box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* ✅ Menü Öğeleri */
+.menu-items {
+    width: 55%;
+    margin-left: 22%;
+    padding: 20px;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.menu-item img {
+    width: 80px;
+    height: 80px;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+.menu-item .card-body {
+    flex: 1;
+}
+
+/* ✅ Sepet */
+.cart-section {
+    width: 20%;
+    padding: 20px;
+    position: fixed;
+    right: 0;
+    top: 60px;
+    height: 100vh;
+    overflow-y: auto;
+    background-color: white;
+    box-shadow: -2px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.cart-item {
+    background-color: #f8f8f8;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* ✅ Popup Tasarımı */
+.popup-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.popup {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 400px;
+}
+
+.popup h2 {
+    margin-top: 0;
+}
+
+.popup button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: #ff6600;
+    color: white;
+}
+
+.btn-secondary {
+    background-color: gray;
+    color: white;
+}

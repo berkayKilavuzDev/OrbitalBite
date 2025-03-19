@@ -1,0 +1,17 @@
+/env
+/orbitalbite/__pycache__
+/db.sqlite3
+/emailfolder
+/orders/emailfolder
+
+/core/migrations
+/core/__pycache__
+
+/menu/migrations
+/menu/__pycache__
+
+/orders/migrations
+/orders/__pycache__
+
+/users/migrations
+/users/__pycache__
