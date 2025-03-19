@@ -1,0 +1,107 @@
+/* ✅ Genel Stil */
+body {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef); /* Daha yumuşak renk geçişi */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Arial', sans-serif;
+}
+
+/* ✅ Navbar ile uyumlu hale getirme */
+.navbar {
+    background-color: black;
+    padding: 10px 0;
+}
+
+.navbar a {
+    color: white !important;
+    text-decoration: none;
+    margin: 0 15px;
+    font-weight: bold;
+    transition: color 0.3s ease-in-out;
+}
+
+.navbar a:hover {
+    color: #3895f1 !important;
+}
+
+/* ✅ Logo */
+.logo img {
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+/* ✅ Form Alanları */
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    margin-top: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+/* ✅ "OR" Bölgesi */
+.or-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin: 20px 0;
+}
+
+.or-container .or-text {
+    padding: 0 10px;
+    background-color: #fff;
+    color: #888;
+    font-weight: bold;
+}
+
+.or-container .left-hr,
+.or-container .right-hr {
+    flex-grow: 1;
+    border: none;
+    border-top: 1px solid #ccc;
+    margin: 0;
+}
+
+/* ✅ Login ve Signup Butonları */
+.auth-btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.auth-btn.login {
+    background-color: #3895f1;
+    color: white;
+}
+
+.auth-btn.login:hover {
+    background-color: #2673c9;
+}
+
+.auth-btn.signup {
+    background-color: #28a745;
+    color: white;
+}
+
+.auth-btn.signup:hover {
+    background-color: #218838;
+}

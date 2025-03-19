@@ -1,119 +1,202 @@
-from django.shortcuts import render, redirect
-
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
-from django.contrib.auth import login
-from django.contrib.auth.views import LoginView
-from .forms import CustomUserCreationForm
-
-from django.contrib.auth import logout
-from django.shortcuts import redirect
-
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
-
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.views import PasswordResetView, PasswordResetConfirmView
 from django.contrib.auth.decorators import login_required
-
-import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from django.utils import timezone
-import os
 from django.contrib import messages
+import json
+import os
 
-@login_required
-def account(request):
-    # Logic to fetch user's account information
-    user = request.user
-    context = {
-        'user': user,
-        # Add other context variables as needed
-    }
-    return render(request, 'account.html', context)
-
-def privacy_view(request):
-    return render(request, 'users/privacy.html')
-
-@login_required
-@require_POST
-def update_ad_subscription(request):
-    data = json.loads(request.body)
-    ad_subscription_status = data.get('ad_subscription', False)
-    
-    # Update the user's ad_subscription field
-    request.user.ad_subscription = ad_subscription_status
-    request.user.save()
-    
-    return JsonResponse({'status': 'success', 'ad_subscription': ad_subscription_status})
-
-
-@login_required
-def upload_resume(request):
-    if request.method == 'POST' and 'resume' in request.FILES:
-        uploaded_pdf = request.FILES['resume']
-
-        # Save the uploaded file to the user's record (replace the existing file)
-        user = request.user
-
-        # Check if the user already has an uploaded file and delete it
-        if user.uploaded_pdf:
-            # Get the path of the existing file and delete it
-            if os.path.isfile(user.uploaded_pdf.path):
-                os.remove(user.uploaded_pdf.path)
-
-        # Update with the new uploaded file
-        user.uploaded_pdf = uploaded_pdf  # This updates the file
-        user.doc_upload_date = timezone.now()  # Update the upload date
-        user.save()
-
-        return JsonResponse({
-            'status': 'success',
-            'file_name': user.uploaded_pdf.name,  # Return the updated file name
-            'upload_date': user.doc_upload_date.strftime('%d.%m.%Y')
-        })
-
-    return JsonResponse({'status': 'error', 'message': 'No file uploaded'}, status=400)
-
-
-def logout(request):
-    logout(request)  # Logs out the user
-    return redirect('home')  # Redirect the user to the login page after logging out
-
-class CustomLoginView(LoginView):
-    template_name = 'users/login.html'  # Specify the template name
-    success_url = reverse_lazy('home')  # Redirect URL after successful login.
-
-
-def signup(request):
-    if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('home')
-    else:
-        form = CustomUserCreationForm()
-    return render(request, 'users/signup.html', {'form': form})
-
-
-from django.contrib.auth.views import PasswordResetView
-from django.urls import reverse_lazy
-from .forms import CustomPasswordResetForm
-
-class CustomPasswordResetView(PasswordResetView):
-    template_name = 'users/password_reset_form.html'  # your custom template
-    success_url = reverse_lazy('users:password_reset_done')
-    form_class = CustomPasswordResetForm  # use the custom form (optional)
-    #email_template_name = 'users/password_reset_email.html'  # custom email template
-
-
-
-from django.contrib.auth.views import PasswordResetConfirmView
+from django.contrib.auth import get_user_model
+from .forms import CustomUserCreationForm, CustomPasswordResetForm
 from django.contrib.auth.forms import SetPasswordForm
 
+User = get_user_model()
+
+# ✅ Kullanıcı Hesabı Bilgilerini Getirme
+@login_required
+def account(request):
+    """
+    Kullanıcı kendi hesap bilgilerini görüntüleyebilir.
+    """
+    user_data = {
+        'id': request.user.id,
+        'username': request.user.username,
+        'email': request.user.email,
+        'role': request.user.role,  # Admin, Çalışan, Müşteri gibi roller
+        'phone_number': request.user.phone_number,
+        'address': request.user.address,
+    }
+
+    return JsonResponse({'status': 'success', 'user': user_data})
+
+
+# ✅ Kullanıcı Profilini Güncelleme
+@csrf_exempt
+@login_required
+def update_profile(request):
+    """
+    Kullanıcı profilini güncelleyebilir.
+    """
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            user = request.user
+
+            user.username = data.get('username', user.username)
+            user.email = data.get('email', user.email)
+            user.phone_number = data.get('phone_number', user.phone_number)
+            user.address = data.get('address', user.address)
+            user.save()
+
+            return JsonResponse({'status': 'success', 'message': 'Profile updated successfully!'})
+        
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
+
+
+# ✅ Kullanıcı Kaydı (Signup)
+@csrf_exempt
+def signup(request):
+    """
+    Yeni kullanıcı oluşturma işlemi.
+    """
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            username = data.get('username')
+            email = data.get('email')
+            password = data.get('password')
+            role = data.get('role', 'customer')  # Varsayılan olarak müşteri
+
+            if not username or not email or not password:
+                return JsonResponse({'status': 'error', 'message': 'Missing required fields'}, status=400)
+
+            user = CustomUser.objects.create_user(username=username, email=email, password=password, role=role)
+            login(request, user)
+
+            return JsonResponse({'status': 'success', 'message': 'User created successfully!', 'user_id': user.id})
+
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
+
+
+# ✅ Kullanıcı Girişi (Login)
+@csrf_exempt
+def login_view(request):
+    """
+    Kullanıcı giriş işlemi için API.
+    """
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            username = data.get('username')
+            password = data.get('password')
+
+            user = authenticate(request, username=username, password=password)
+
+            if user is not None:
+                login(request, user)
+                return JsonResponse({'status': 'success', 'message': 'Login successful', 'user_id': user.id, 'role': user.role})
+            else:
+                return JsonResponse({'status': 'error', 'message': 'Invalid credentials'}, status=400)
+
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
+
+
+# ✅ Kullanıcı Çıkışı (Logout)
+@login_required
+def logout_view(request):
+    """
+    Kullanıcıyı çıkış yaptırır.
+    """
+    logout(request)
+    return JsonResponse({'status': 'success', 'message': 'Logout successful'})
+
+
+# ✅ Kullanıcı Şifre Sıfırlama
+class CustomPasswordResetView(PasswordResetView):
+    """
+    Şifre sıfırlama işlemi için özel sınıf.
+    """
+    template_name = 'users/password_reset_form.html'
+    success_url = reverse_lazy('users:password_reset_done')
+    form_class = CustomPasswordResetForm
+
+
+# ✅ Kullanıcı Şifre Yenileme
 class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    """
+    Kullanıcının yeni şifre belirlemesi için sınıf.
+    """
     template_name = 'users/password_reset_confirm.html'
-    success_url = reverse_lazy('password_reset_complete')  # Use reverse_lazy for correct URL resolution
+    success_url = reverse_lazy('password_reset_complete')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Ensure the form is passed to the template
         context['form'] = SetPasswordForm(self.request.user)
         return context
+        
+@csrf_exempt
+@login_required
+def update_profile(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            user = request.user
+
+            user.first_name = data.get('first_name', user.first_name)
+            user.last_name = data.get('last_name', user.last_name)
+            user.email = data.get('email', user.email)
+            user.phone_number = data.get('phone_number', user.phone_number)
+            user.address = data.get('address', user.address)
+            user.save()
+
+            return JsonResponse({'status': 'success', 'message': 'Profile updated successfully!'})
+        
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
+    # ✅ Kullanıcı Şifre Değiştirme (Eksik API'yi ekliyoruz)
+    
+@csrf_exempt
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            user = request.user
+            current_password = data.get('current_password')
+            new_password = data.get('new_password')
+            confirm_password = data.get('confirm_password')
+
+            # Mevcut şifre doğru mu kontrol et
+            if not user.check_password(current_password):
+                return JsonResponse({'status': 'error', 'message': 'Current password is incorrect'}, status=400)
+
+            # Yeni şifreler eşleşiyor mu?
+            if new_password != confirm_password:
+                return JsonResponse({'status': 'error', 'message': 'New passwords do not match'}, status=400)
+
+            # Yeni şifreyi ayarla ve kaydet
+            user.set_password(new_password)
+            user.save()
+
+            return JsonResponse({'status': 'success', 'message': 'Password changed successfully!'})
+
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
